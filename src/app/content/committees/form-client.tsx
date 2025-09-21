@@ -46,7 +46,7 @@ export default function CommitteeFormClient({ initial, mode, id }: { initial?: P
 
   async function handleDelete() {
     if (!id) return;
-    if (!confirm("Bu üyeyi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
+    if (!confirm("Bu kurulu silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setSaving(true);
     try {
       await supabase.from("committees").delete().eq("id", id);
@@ -59,7 +59,7 @@ export default function CommitteeFormClient({ initial, mode, id }: { initial?: P
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">{mode === "new" ? "Yeni Üye" : "Üyeyi Düzenle"}</h1>
+        <h1 className="text-xl font-semibold">{mode === "new" ? "Yeni Kurul" : "Kurulu Düzenle"}</h1>
         <div className="flex gap-2">
           {mode === "edit" && (
             <button className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))} onClick={handleDelete} disabled={saving}>
@@ -77,7 +77,7 @@ export default function CommitteeFormClient({ initial, mode, id }: { initial?: P
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
           <div className="rounded border p-4 dark:border-dark-3 space-y-3">
-            <label className="block text-sm">İsim</label>
+            <label className="block text-sm">Kurul Adı</label>
             <input className="w-full rounded border p-2" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
 
             <label className="block text-sm">Görev</label>

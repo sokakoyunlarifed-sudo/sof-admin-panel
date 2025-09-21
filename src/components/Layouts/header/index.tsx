@@ -13,7 +13,7 @@ function getPageMeta(pathname: string) {
     { test: /^\/calendar/, title: "Takvim", subtitle: "Planla ve programını takip et" },
     { test: /^\/content\/news/, title: "Haberler", subtitle: "Haber oluştur ve yönet" },
     { test: /^\/content\/announcements/, title: "Duyurular", subtitle: "Duyuru oluştur ve yönet" },
-    { test: /^\/content\/committees/, title: "Kurullar", subtitle: "Kurul üyelerini yönet" },
+    { test: /^\/content\/committees/, title: "Kurullar", subtitle: "Kurulları yönet" },
     { test: /^\/media/, title: "Medya Kütüphanesi", subtitle: "Varlıkları yükle ve yönet" },
     { test: /^\/users/, title: "Kullanıcılar", subtitle: "Erişim kontrolü ve roller" },
     { test: /^\/forms/, title: "Formlar", subtitle: "Örnekler ve kalıplar" },

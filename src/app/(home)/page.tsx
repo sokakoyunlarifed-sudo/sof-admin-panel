@@ -58,7 +58,7 @@ export default async function Home({ searchParams }: PropsType) {
       <div className="mt-4 flex flex-wrap gap-3">
         <Link href="/content/news/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Haber</Link>
         <Link href="/content/announcements/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Duyuru</Link>
-        <Link href="/content/committees/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Kurul Üyesi</Link>
+        <Link href="/content/committees/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Kurul</Link>
       </div>
 
       {/* Content Overview chart */}

@@ -41,7 +41,7 @@ export default function CommitteesListClient({ initial, role }: { initial: Commi
   }, [search]);
 
   async function remove(id: string) {
-    if (!confirm("Bu üyeyi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
+    if (!confirm("Bu kurulu silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setLoading(true);
     try {
       const { error } = await supabase.from("committees").delete().eq("id", id);
@@ -55,10 +55,10 @@ export default function CommitteesListClient({ initial, role }: { initial: Commi
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-1 items-center gap-2">
-          <input className="w-full max-w-sm rounded border p-2" placeholder="İsim ara" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input className="w-full max-w-sm rounded border p-2" placeholder="Kurul adı ara" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <Link href="/content/committees/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>
-          Yeni Üye
+          Yeni Kurul
         </Link>
       </div>
 
@@ -66,7 +66,7 @@ export default function CommitteesListClient({ initial, role }: { initial: Commi
         <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-3">
           <thead className="bg-gray-50 dark:bg-dark-3">
             <tr>
-              <th className="px-4 py-2 text-left text-sm font-medium">İsim</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Kurul Adı</th>
               <th className="px-4 py-2 text-left text-sm font-medium">Görev</th>
               <th className="px-4 py-2 text-left text-sm font-medium">Oluşturulma</th>
               <th className="px-4 py-2 text-right text-sm font-medium">İşlemler</th>
