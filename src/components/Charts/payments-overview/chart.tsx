@@ -92,15 +92,15 @@ export function PaymentsOverviewChart({ data }: PropsType) {
         options={options}
         series={[
           {
-            name: "News",
+            name: "Haberler",
             data: data.news,
           },
           {
-            name: "Announcements",
+            name: "Duyurular",
             data: data.announcements,
           },
           {
-            name: "Committees",
+            name: "Komiteler",
             data: data.committees,
           },
         ]}

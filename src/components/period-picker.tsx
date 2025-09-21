@@ -27,6 +27,11 @@ export function PeriodPicker<TItem extends string>({
 
   const [isOpen, setIsOpen] = useState(false);
 
+  const labelMap: Record<string, string> = {
+    monthly: "Aylık",
+    yearly: "Yıllık",
+  };
+
   return (
     <Dropdown isOpen={isOpen} setIsOpen={setIsOpen}>
       <DropdownTrigger
@@ -36,7 +41,7 @@ export function PeriodPicker<TItem extends string>({
             "border-none bg-transparent p-0 text-dark dark:bg-transparent dark:text-white",
         )}
       >
-        <span className="capitalize">{defaultValue || "Time Period"}</span>
+        <span className="capitalize">{(defaultValue && labelMap[String(defaultValue)]) || "Zaman Aralığı"}</span>
 
         <ChevronUpIcon className="size-4 rotate-180 transition-transform" />
       </DropdownTrigger>
@@ -64,7 +69,7 @@ export function PeriodPicker<TItem extends string>({
                   setIsOpen(false);
                 }}
               >
-                {item}
+                {labelMap[String(item)] || String(item)}
               </button>
             </li>
           ))}

@@ -177,7 +177,7 @@ export default function EventFormClient({
       }
       router.replace("/content/events");
     } catch (err: any) {
-      setError(err?.message || "Failed to save");
+      setError(err?.message || "Kaydetme başarısız");
     } finally {
       setSaving(false);
     }
@@ -185,7 +185,7 @@ export default function EventFormClient({
 
   async function handleDelete() {
     if (!id) return;
-    if (!confirm("Delete this event? This cannot be undone.")) return;
+    if (!confirm("Bu etkinliği silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setSaving(true);
     try {
       await supabase.from("events").delete().eq("id", id);
@@ -201,7 +201,7 @@ export default function EventFormClient({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">{mode === "new" ? "New Event" : "Edit Event"}</h1>
+        <h1 className="text-xl font-semibold">{mode === "new" ? "Yeni Etkinlik" : "Etkinliği Düzenle"}</h1>
         <div className="flex gap-2">
           {mode === "edit" && (
             <button
@@ -209,7 +209,7 @@ export default function EventFormClient({
               onClick={handleDelete}
               disabled={saving}
             >
-              Delete
+              Sil
             </button>
           )}
           <button
@@ -217,14 +217,14 @@ export default function EventFormClient({
             onClick={() => handleSave(false)}
             disabled={saving}
           >
-            Save as Draft
+            Taslak Olarak Kaydet
           </button>
           <button
             className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}
             onClick={() => handleSave(true)}
             disabled={saving}
           >
-            Publish
+            Yayınla
           </button>
         </div>
       </div>
@@ -259,7 +259,7 @@ export default function EventFormClient({
 
         <div className="space-y-4">
           <div className="rounded border p-4 dark:border-dark-3">
-            <h2 className="mb-2 font-medium">Featured Image</h2>
+            <h2 className="mb-2 font-medium">Kapak Görseli</h2>
             <ImageUploader
               folder="events"
               initialUrl={activeTab === "en" ? en.image_url : az.image_url}
@@ -272,7 +272,7 @@ export default function EventFormClient({
 
           <div className="rounded border p-4 dark:border-dark-3">
             <h2 className="mb-2 font-medium">Metadata</h2>
-            <label className="mb-1 block text-sm">Created at</label>
+            <label className="mb-1 block text-sm">Oluşturulma</label>
             <input
               type="datetime-local"
               className="w-full rounded border p-2"
@@ -289,15 +289,15 @@ export default function EventFormClient({
 function LangForm({ data, onChange, showDate, valueDate, onChangeDate }: { data: EventDraft; onChange: (d: EventDraft) => void; showDate?: boolean; valueDate: string; onChangeDate: (v: string) => void }) {
   return (
     <div className="space-y-3">
-      <label className="block text-sm">Title</label>
+      <label className="block text-sm">Başlık</label>
       <input className="w-full rounded border p-2" value={data.title} onChange={(e) => onChange({ ...data, title: e.target.value })} />
-      <label className="block text-sm">Description</label>
+      <label className="block text-sm">Açıklama</label>
       <textarea className="w-full rounded border p-2" value={data.description} onChange={(e) => onChange({ ...data, description: e.target.value })} />
-      <label className="block text-sm">Location</label>
+      <label className="block text-sm">Yer</label>
       <input className="w-full rounded border p-2" value={data.location} onChange={(e) => onChange({ ...data, location: e.target.value })} />
       {showDate && (
         <>
-          <label className="block text-sm">Event date</label>
+          <label className="block text-sm">Etkinlik tarihi</label>
           <input type="datetime-local" className="w-full rounded border p-2" value={valueDate} onChange={(e) => onChangeDate(e.target.value)} />
         </>
       )}

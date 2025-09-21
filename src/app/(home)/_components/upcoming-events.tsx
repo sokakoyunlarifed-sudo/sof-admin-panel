@@ -10,10 +10,10 @@ export default async function LatestAnnouncements() {
 
   return (
     <div className="flex h-full flex-col rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">
-      <h3 className="mb-3 text-base font-semibold">Latest Announcements</h3>
+      <h3 className="mb-3 text-base font-semibold">En Son Duyurular</h3>
       <ul className="space-y-2">
         {(data || []).length === 0 && (
-          <li className="rounded bg-gray-2 p-3 text-sm text-dark-6 dark:bg-dark-3">No announcements</li>
+          <li className="rounded bg-gray-2 p-3 text-sm text-dark-6 dark:bg-dark-3">Duyuru yok</li>
         )}
         {(data || []).map((e) => (
           <li key={e.id} className="rounded bg-gray-2 p-3 text-sm dark:bg-dark-3">

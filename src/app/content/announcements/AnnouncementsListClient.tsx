@@ -45,7 +45,7 @@ export default function AnnouncementsListClient({ initial, role }: { initial: An
   }, [search]);
 
   async function remove(id: string) {
-    if (!confirm("Delete this item? This cannot be undone.")) return;
+    if (!confirm("Bu duyuruyu silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setLoading(true);
     try {
       const { error } = await supabase.from("announcements").delete().eq("id", id);
@@ -61,13 +61,13 @@ export default function AnnouncementsListClient({ initial, role }: { initial: An
         <div className="flex flex-1 items-center gap-2">
           <input
             className="w-full max-w-sm rounded border p-2"
-            placeholder="Search title"
+            placeholder="Başlık ara"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <Link href="/content/announcements/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>
-          New Announcement
+          Yeni Duyuru
         </Link>
       </div>
 
@@ -75,11 +75,11 @@ export default function AnnouncementsListClient({ initial, role }: { initial: An
         <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-3">
           <thead className="bg-gray-50 dark:bg-dark-3">
             <tr>
-              <th className="px-4 py-2 text-left text-sm font-medium">Title</th>
-              <th className="px-4 py-2 text-left text-sm font-medium">Date</th>
-              <th className="px-4 py-2 text-left text-sm font-medium">Location</th>
-              <th className="px-4 py-2 text-left text-sm font-medium">Created</th>
-              <th className="px-4 py-2 text-right text-sm font-medium">Actions</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Başlık</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Tarih</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Yer</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Oluşturulma</th>
+              <th className="px-4 py-2 text-right text-sm font-medium">İşlemler</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-dark-3">
@@ -102,11 +102,11 @@ export default function AnnouncementsListClient({ initial, role }: { initial: An
                 <td className="px-4 py-2 text-right">
                   <div className="flex justify-end gap-2">
                     <Link href={`/content/announcements/${n.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>
-                      Edit
+                      Düzenle
                     </Link>
                     {role === "admin" && (
                       <button onClick={() => remove(n.id)} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))} disabled={loading}>
-                        Delete
+                        Sil
                       </button>
                     )}
                   </div>
@@ -116,7 +116,7 @@ export default function AnnouncementsListClient({ initial, role }: { initial: An
             {!rows.length && (
               <tr>
                 <td colSpan={5} className="px-4 py-10 text-center text-sm text-dark-6">
-                  {loading ? "Loading..." : "No results"}
+                  {loading ? "Yükleniyor..." : "Sonuç bulunamadı"}
                 </td>
               </tr>
             )}

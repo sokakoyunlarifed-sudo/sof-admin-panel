@@ -46,7 +46,7 @@ export default function SigninWithPassword() {
         router.replace("/");
       }
     } catch (err: any) {
-      setError(err?.message || "Unexpected error");
+      setError(err?.message || "Beklenmeyen bir hata oluştu");
     } finally {
       setLoading(false);
     }
@@ -56,9 +56,9 @@ export default function SigninWithPassword() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <InputGroup
         type="email"
-        label="Email"
+        label="E-posta"
         className="[&_input]:py-[16px]"
-        placeholder="Enter your email"
+        placeholder="E-posta adresinizi girin"
         name="email"
         handleChange={handleChange}
         value={data.email}
@@ -67,9 +67,9 @@ export default function SigninWithPassword() {
 
       <InputGroup
         type="password"
-        label="Password"
+        label="Şifre"
         className="[&_input]:py-[16px]"
-        placeholder="Enter your password"
+        placeholder="Şifrenizi girin"
         name="password"
         handleChange={handleChange}
         value={data.password}
@@ -82,7 +82,7 @@ export default function SigninWithPassword() {
 
       <div className="flex items-center justify-between gap-2 py-2 font-medium">
         <Checkbox
-          label="Remember me"
+          label="Beni hatırla"
           name="remember"
           withIcon="check"
           minimal
@@ -101,7 +101,7 @@ export default function SigninWithPassword() {
           type="submit"
           className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary p-4 text-base font-semibold text-white transition hover:bg-opacity-90"
         >
-          Sign In
+          Giriş Yap
           {loading && (
             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-t-transparent dark:border-primary dark:border-t-transparent" />
           )}

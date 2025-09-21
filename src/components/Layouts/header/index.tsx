@@ -9,20 +9,20 @@ import { MenuIcon } from "./icons";
 
 function getPageMeta(pathname: string) {
   const map: Array<{ test: RegExp; title: string; subtitle?: string }> = [
-    { test: /^\/$/, title: "Overview", subtitle: "Key metrics and quick insights" },
-    { test: /^\/calendar/, title: "Calendar", subtitle: "Plan and track your schedule" },
-    { test: /^\/content\/news/, title: "News", subtitle: "Create and manage news" },
-    { test: /^\/content\/announcements/, title: "Announcements", subtitle: "Create and manage announcements" },
-    { test: /^\/content\/committees/, title: "Committees", subtitle: "Manage committee members" },
-    { test: /^\/media/, title: "Media Library", subtitle: "Upload and manage assets" },
-    { test: /^\/users/, title: "Users", subtitle: "Access control and roles" },
-    { test: /^\/forms/, title: "Forms", subtitle: "Examples and patterns" },
-    { test: /^\/tables/, title: "Tables", subtitle: "Data views and lists" },
-    { test: /^\/pages\/settings/, title: "Settings", subtitle: "Profile, security and preferences" },
-    { test: /^\/profile/, title: "Profile", subtitle: "Your personal information" },
+    { test: /^\/$/, title: "Genel Bakış", subtitle: "Özet metrikler ve hızlı içgörüler" },
+    { test: /^\/calendar/, title: "Takvim", subtitle: "Planla ve programını takip et" },
+    { test: /^\/content\/news/, title: "Haberler", subtitle: "Haber oluştur ve yönet" },
+    { test: /^\/content\/announcements/, title: "Duyurular", subtitle: "Duyuru oluştur ve yönet" },
+    { test: /^\/content\/committees/, title: "Komiteler", subtitle: "Komite üyelerini yönet" },
+    { test: /^\/media/, title: "Medya Kütüphanesi", subtitle: "Varlıkları yükle ve yönet" },
+    { test: /^\/users/, title: "Kullanıcılar", subtitle: "Erişim kontrolü ve roller" },
+    { test: /^\/forms/, title: "Formlar", subtitle: "Örnekler ve kalıplar" },
+    { test: /^\/tables/, title: "Tablolar", subtitle: "Veri görünümleri ve listeler" },
+    { test: /^\/pages\/settings/, title: "Ayarlar", subtitle: "Profil, güvenlik ve tercihleri" },
+    { test: /^\/profile/, title: "Profil", subtitle: "Kişisel bilgileriniz" },
   ];
   for (const r of map) if (r.test.test(pathname)) return r;
-  return { title: "Overview", subtitle: "Key metrics and quick insights" };
+  return { title: "Genel Bakış", subtitle: "Özet metrikler ve hızlı içgörüler" };
 }
 
 export function Header() {
@@ -41,7 +41,7 @@ export function Header() {
           <button
             onClick={toggleSidebar}
             className="rounded-lg border px-2.5 py-2 text-dark hover:bg-gray-100 dark:border-dark-3 dark:text-white dark:hover:bg-[#FFFFFF1A] xl:hidden"
-            aria-label="Toggle sidebar"
+            aria-label="Kenar çubuğunu aç/kapat"
           >
             <MenuIcon />
           </button>

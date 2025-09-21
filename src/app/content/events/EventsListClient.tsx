@@ -65,7 +65,7 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
   }
 
   async function remove(id: string) {
-    if (!confirm("Delete this event? This cannot be undone.")) return;
+    if (!confirm("Bu etkinliği silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setLoading(true);
     try {
       const { error } = await supabase.from("events").delete().eq("id", id);
@@ -81,7 +81,7 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
         <div className="flex flex-1 items-center gap-2">
           <input
             className="w-full max-w-sm rounded border p-2"
-            placeholder="Search title or location"
+            placeholder="Başlık veya yer ara"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -90,14 +90,14 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
             value={status}
             onChange={(e) => setStatus(e.target.value as any)}
           >
-            <option value="all">All</option>
-            <option value="published">Published</option>
-            <option value="draft">Draft</option>
+            <option value="all">Tümü</option>
+            <option value="published">Yayında</option>
+            <option value="draft">Taslak</option>
           </select>
         </div>
         {(role === "admin" || role === "superadmin") && (
           <Link href="/content/events/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>
-            New Event
+            Yeni Etkinlik
           </Link>
         )}
       </div>
@@ -106,11 +106,11 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
         <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-3">
           <thead className="bg-gray-50 dark:bg-dark-3">
             <tr>
-              <th className="px-4 py-2 text-left text-sm font-medium">Title</th>
-              <th className="px-4 py-2 text-left text-sm font-medium">Location</th>
-              <th className="px-4 py-2 text-left text-sm font-medium">Date</th>
-              <th className="px-4 py-2 text-left text-sm font-medium">Status</th>
-              <th className="px-4 py-2 text-right text-sm font-medium">Actions</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Başlık</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Yer</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Tarih</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Durum</th>
+              <th className="px-4 py-2 text-right text-sm font-medium">İşlemler</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-dark-3">
@@ -129,15 +129,15 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
                 <td className="px-4 py-2 text-sm">{n.event_date ? new Date(n.event_date).toLocaleString() : "-"}</td>
                 <td className="px-4 py-2">
                   {n.published_at ? (
-                    <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-700">Published</span>
+                    <span className="rounded bg-green-100 px-2 py-1 text-xs text-green-700">Yayında</span>
                   ) : (
-                    <span className="rounded bg-yellow-100 px-2 py-1 text-xs text-yellow-700">Draft</span>
+                    <span className="rounded bg-yellow-100 px-2 py-1 text-xs text-yellow-700">Taslak</span>
                   )}
                 </td>
                 <td className="px-4 py-2 text-right">
                   <div className="flex justify-end gap-2">
                     <Link href={`/content/events/${n.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>
-                      Edit
+                      Düzenle
                     </Link>
                     {(role === "admin" || role === "superadmin") && (
                       n.published_at ? (
@@ -146,7 +146,7 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
                           className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}
                           disabled={loading}
                         >
-                          Unpublish
+                          Yayından Kaldır
                         </button>
                       ) : (
                         <button
@@ -154,7 +154,7 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
                           className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}
                           disabled={loading}
                         >
-                          Publish
+                          Yayınla
                         </button>
                       )
                     )}
@@ -164,7 +164,7 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
                         className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}
                         disabled={loading}
                       >
-                        Delete
+                        Sil
                       </button>
                     )}
                   </div>
@@ -174,7 +174,7 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
             {!rows.length && (
               <tr>
                 <td colSpan={5} className="px-4 py-10 text-center text-sm text-dark-6">
-                  {loading ? "Loading..." : "No results"}
+                  {loading ? "Yükleniyor..." : "Sonuç bulunamadı"}
                 </td>
               </tr>
             )}

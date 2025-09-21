@@ -11,16 +11,16 @@ import { Button } from "@/components/ui-elements/button";
 
 export function PersonalInfoForm() {
   return (
-    <ShowcaseSection title="Personal Information" className="!p-7">
+    <ShowcaseSection title="Kişisel Bilgiler" className="!p-7">
       <form>
         <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
           <InputGroup
             className="w-full sm:w-1/2"
             type="text"
             name="fullName"
-            label="Full Name"
-            placeholder="David Jhon"
-            defaultValue="David Jhon"
+            label="Ad Soyad"
+            placeholder="Ad Soyad"
+            defaultValue="Ad Soyad"
             icon={<UserIcon />}
             iconPosition="left"
             height="sm"
@@ -30,9 +30,9 @@ export function PersonalInfoForm() {
             className="w-full sm:w-1/2"
             type="text"
             name="phoneNumber"
-            label="Phone Number"
-            placeholder="+990 3343 7865"
-            defaultValue={"+990 3343 7865"}
+            label="Telefon Numarası"
+            placeholder="+90 5xx xxx xx xx"
+            defaultValue={"+90 5xx xxx xx xx"}
             icon={<CallIcon />}
             iconPosition="left"
             height="sm"
@@ -43,9 +43,9 @@ export function PersonalInfoForm() {
           className="mb-5.5"
           type="email"
           name="email"
-          label="Email Address"
-          placeholder="devidjond45@gmail.com"
-          defaultValue="devidjond45@gmail.com"
+          label="E-posta Adresi"
+          placeholder="eposta@ornek.com"
+          defaultValue="eposta@ornek.com"
           icon={<EmailIcon />}
           iconPosition="left"
           height="sm"
@@ -55,9 +55,9 @@ export function PersonalInfoForm() {
           className="mb-5.5"
           type="text"
           name="username"
-          label="Username"
-          placeholder="devidjhon24"
-          defaultValue="devidjhon24"
+          label="Kullanıcı Adı"
+          placeholder="kullaniciadi"
+          defaultValue="kullaniciadi"
           icon={<UserIcon />}
           iconPosition="left"
           height="sm"
@@ -65,10 +65,10 @@ export function PersonalInfoForm() {
 
         <TextAreaGroup
           className="mb-5.5"
-          label="BIO"
-          placeholder="Write your bio here"
+          label="BİYOGRAFİ"
+          placeholder="Biyografinizi buraya yazın"
           icon={<PencilSquareIcon />}
-          defaultValue="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam lacinia turpis tortor, consequat efficitur mi congue a. Curabitur cursus, ipsum ut lobortis sodales, enim arcu pellentesque lectus ac suscipit diam sem a felis. Cras sapien ex, blandit eu dui et suscipit gravida nunc. Sed sed est quis dui."
+          defaultValue=""
         />
 
         <div className="flex justify-end gap-3">
@@ -76,10 +76,10 @@ export function PersonalInfoForm() {
             className="rounded-lg border border-stroke px-6 py-[7px] font-medium text-dark hover:shadow-1 dark:border-dark-3 dark:text-white"
             type="button"
           >
-            Cancel
+            İptal
           </button>
 
-          <Button label="Save Changes" variant="primary" shape="rounded" size="small" />
+          <Button label="Değişiklikleri Kaydet" variant="primary" shape="rounded" size="small" />
         </div>
       </form>
     </ShowcaseSection>

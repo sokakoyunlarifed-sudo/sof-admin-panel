@@ -182,7 +182,7 @@ export default function ProjectFormClient({
       }
       router.replace("/content/projects");
     } catch (err: any) {
-      setError(err?.message || "Failed to save");
+      setError(err?.message || "Kaydetme başarısız");
     } finally {
       setSaving(false);
     }
@@ -190,7 +190,7 @@ export default function ProjectFormClient({
 
   async function handleDelete() {
     if (!id) return;
-    if (!confirm("Delete this project? This cannot be undone.")) return;
+    if (!confirm("Bu projeyi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setSaving(true);
     try {
       await supabase.from("projects").delete().eq("id", id);
@@ -205,7 +205,7 @@ export default function ProjectFormClient({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">{mode === "new" ? "New Project" : "Edit Project"}</h1>
+        <h1 className="text-xl font-semibold">{mode === "new" ? "Yeni Proje" : "Projeyi Düzenle"}</h1>
         <div className="flex gap-2">
           {mode === "edit" && (
             <button
@@ -213,7 +213,7 @@ export default function ProjectFormClient({
               onClick={handleDelete}
               disabled={saving}
             >
-              Delete
+              Sil
             </button>
           )}
           <button
@@ -221,14 +221,14 @@ export default function ProjectFormClient({
             onClick={() => handleSave(false)}
             disabled={saving}
           >
-            Save as Draft
+            Taslak Olarak Kaydet
           </button>
           <button
             className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}
             onClick={() => handleSave(true)}
             disabled={saving}
           >
-            Publish
+            Yayınla
           </button>
         </div>
       </div>
@@ -263,7 +263,7 @@ export default function ProjectFormClient({
 
         <div className="space-y-4">
           <div className="rounded border p-4 dark:border-dark-3">
-            <h2 className="mb-2 font-medium">Featured Image</h2>
+            <h2 className="mb-2 font-medium">Kapak Görseli</h2>
             <ImageUploader
               folder="projects"
               initialUrl={activeTab === "en" ? en.image_url : az.image_url}
@@ -276,7 +276,7 @@ export default function ProjectFormClient({
 
           <div className="rounded border p-4 dark:border-dark-3">
             <h2 className="mb-2 font-medium">Metadata</h2>
-            <label className="mb-1 block text-sm">Created at</label>
+            <label className="mb-1 block text-sm">Oluşturulma</label>
             <input
               type="datetime-local"
               className="w-full rounded border p-2"
@@ -293,11 +293,11 @@ export default function ProjectFormClient({
 function LangForm({ data, onChange }: { data: ProjectDraft; onChange: (d: ProjectDraft) => void }) {
   return (
     <div className="space-y-3">
-      <label className="block text-sm">Title</label>
+      <label className="block text-sm">Başlık</label>
       <input className="w-full rounded border p-2" value={data.title} onChange={(e) => onChange({ ...data, title: e.target.value })} />
-      <label className="block text-sm">Summary</label>
+      <label className="block text-sm">Özet</label>
       <textarea className="w-full rounded border p-2" value={data.summary} onChange={(e) => onChange({ ...data, summary: e.target.value })} />
-      <label className="block text-sm">Content</label>
+      <label className="block text-sm">İçerik</label>
       <textarea className="min-h-40 w-full rounded border p-2" value={data.content} onChange={(e) => onChange({ ...data, content: e.target.value })} />
       <label className="block text-sm">Slug</label>
       <input className="w-full rounded border p-2" value={data.slug} onChange={(e) => onChange({ ...data, slug: e.target.value })} />

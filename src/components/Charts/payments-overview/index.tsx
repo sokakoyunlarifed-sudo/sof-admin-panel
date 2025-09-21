@@ -36,7 +36,7 @@ export async function PaymentsOverview({
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
-          Content Overview
+          İçerik Genel Bakışı
         </h2>
 
         <PeriodPicker defaultValue={timeFrame} sectionKey="payments_overview" />
@@ -49,21 +49,21 @@ export async function PaymentsOverview({
           <dt className="text-xl font-bold text-dark dark:text-white">
             {standardFormat(totalNews)}
           </dt>
-          <dd className="font-medium dark:text-dark-6">News (total)</dd>
+          <dd className="font-medium dark:text-dark-6">Haberler (toplam)</dd>
         </div>
 
         <div className="dark:border-dark-3 max-sm:mb-3 max-sm:border-b max-sm:pb-3">
           <dt className="text-xl font-bold text-dark dark:text-white">
             {standardFormat(totalAnnouncements)}
           </dt>
-          <dd className="font-medium dark:text-dark-6">Announcements (total)</dd>
+          <dd className="font-medium dark:text-dark-6">Duyurular (toplam)</dd>
         </div>
 
         <div>
           <dt className="text-xl font-bold text-dark dark:text-white">
             {standardFormat(totalCommittees)}
           </dt>
-          <dd className="font-medium dark:text-dark-6">Committees (total)</dd>
+          <dd className="font-medium dark:text-dark-6">Komiteler (toplam)</dd>
         </div>
       </dl>
     </div>

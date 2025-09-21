@@ -20,7 +20,7 @@ function roleStyles(role: ProfileRole) {
 function formatDate(v?: string | null) {
   if (!v) return "";
   try {
-    return new Date(v).toLocaleString("en-US", { year: "numeric", month: "short", day: "2-digit" });
+    return new Date(v).toLocaleString("tr-TR", { year: "numeric", month: "short", day: "2-digit" });
   } catch {
     return "";
   }
@@ -73,7 +73,7 @@ export default function ProfilesClient({ initial, currentRole }: { initial: Prof
   };
 
   const removeProfile = async (id: string) => {
-    if (!confirm("Delete this profile? This cannot be undone.")) return;
+    if (!confirm("Bu profili silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setLoading(true);
     try {
       await supabase.from("profiles").delete().eq("id", id);
@@ -84,7 +84,7 @@ export default function ProfilesClient({ initial, currentRole }: { initial: Prof
   };
 
   async function resetPassword(userId: string) {
-    const newPassword = prompt("Enter a new password (min 6 chars)");
+    const newPassword = prompt("Yeni bir şifre girin (en az 6 karakter)");
     if (!newPassword) return;
     const fd = new FormData();
     fd.append("userId", userId);
@@ -92,9 +92,9 @@ export default function ProfilesClient({ initial, currentRole }: { initial: Prof
     const res = await fetch("/api/auth/admin-reset-password", { method: "POST", body: fd });
     if (!res.ok) {
       const j = await res.json().catch(() => ({}));
-      alert(j.error || "Failed to reset password (service key required)");
+      alert(j.error || "Şifre sıfırlama başarısız (servis anahtarı gerekli)");
     } else {
-      alert("Password reset successfully");
+      alert("Şifre başarıyla sıfırlandı");
     }
   }
 
@@ -110,25 +110,25 @@ export default function ProfilesClient({ initial, currentRole }: { initial: Prof
         <div className="flex items-center gap-2">
           <input
             className="w-72 rounded border p-2 focus:border-primary focus:ring-2 focus:ring-primary/30"
-            placeholder="Search email"
+            placeholder="E-posta ara"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select className="rounded border p-2 focus:border-primary focus:ring-2 focus:ring-primary/30" value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as any)}>
-            <option value="all">All roles</option>
-            <option value="user">user</option>
+            <option value="all">Tümü</option>
+            <option value="user">kullanıcı</option>
             <option value="admin">admin</option>
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <div className="text-sm text-dark-6">{loading ? "Loading..." : `${rows.length} result(s)`}</div>
-          <button className={cn(buttonVariants({ variant: "outlinePrimary", shape: "rounded", size: "small" }))} onClick={refresh} disabled={loading}>Refresh</button>
+          <div className="text-sm text-dark-6">{loading ? "Yükleniyor..." : `${rows.length} sonuç`}</div>
+          <button className={cn(buttonVariants({ variant: "outlinePrimary", shape: "rounded", size: "small" }))} onClick={refresh} disabled={loading}>Yenile</button>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button onClick={() => setRoleFilter("all")} className={cn("rounded-full px-3 py-1 text-xs font-medium ring-1", roleFilter === "all" ? "bg-primary text-white ring-primary/60" : "bg-gray-100 text-dark ring-gray-300 dark:bg-dark-2 dark:text-white/80")}>All {counts.all}</button>
-        <button onClick={() => setRoleFilter("user")} className={cn("rounded-full px-3 py-1 text-xs font-medium ring-1", roleFilter === "user" ? "bg-gray-700 text-white ring-gray-400" : "bg-gray-100 text-dark ring-gray-300 dark:bg-dark-2 dark:text-white/80")}>User {counts.user}</button>
+        <button onClick={() => setRoleFilter("all")} className={cn("rounded-full px-3 py-1 text-xs font-medium ring-1", roleFilter === "all" ? "bg-primary text-white ring-primary/60" : "bg-gray-100 text-dark ring-gray-300 dark:bg-dark-2 dark:text-white/80")}>Tümü {counts.all}</button>
+        <button onClick={() => setRoleFilter("user")} className={cn("rounded-full px-3 py-1 text-xs font-medium ring-1", roleFilter === "user" ? "bg-gray-700 text-white ring-gray-400" : "bg-gray-100 text-dark ring-gray-300 dark:bg-dark-2 dark:text-white/80")}>Kullanıcı {counts.user}</button>
         <button onClick={() => setRoleFilter("admin")} className={cn("rounded-full px-3 py-1 text-xs font-medium ring-1", roleFilter === "admin" ? "bg-blue-600 text-white ring-blue-400" : "bg-blue-50 text-blue-700 ring-blue-200")}>Admin {counts.admin}</button>
       </div>
 
@@ -136,10 +136,10 @@ export default function ProfilesClient({ initial, currentRole }: { initial: Prof
         <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-3">
           <thead className="bg-gray-50 dark:bg-dark-3">
             <tr>
-              <th className="px-4 py-2 text-left text-sm font-medium">Email</th>
-              <th className="px-4 py-2 text-left text-sm font-medium">Role</th>
-              <th className="px-4 py-2 text-left text-sm font-medium">Created</th>
-              {isAdmin && <th className="px-4 py-2 text-right text-sm font-medium">Actions</th>}
+              <th className="px-4 py-2 text-left text-sm font-medium">E-posta</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Rol</th>
+              <th className="px-4 py-2 text-left text-sm font-medium">Oluşturulma</th>
+              {isAdmin && <th className="px-4 py-2 text-right text-sm font-medium">İşlemler</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-dark-3">
@@ -157,7 +157,7 @@ export default function ProfilesClient({ initial, currentRole }: { initial: Prof
                           value={p.role}
                           onChange={(e) => updateRole(p.id, e.target.value as ProfileRole)}
                         >
-                          <option value="user">user</option>
+                          <option value="user">kullanıcı</option>
                           <option value="admin">admin</option>
                         </select>
                       </div>
@@ -172,10 +172,10 @@ export default function ProfilesClient({ initial, currentRole }: { initial: Prof
                   {isAdmin && (
                     <td className="px-4 py-2 text-right space-x-2">
                       <button className={cn(buttonVariants({ variant: "outlineDanger", shape: "rounded", size: "small" }))} onClick={() => removeProfile(p.id)} disabled={loading}>
-                        Delete
+                        Sil
                       </button>
                       <button className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))} onClick={() => resetPassword(p.id)} disabled={loading}>
-                        Reset Password
+                        Şifreyi Sıfırla
                       </button>
                     </td>
                   )}
@@ -185,7 +185,7 @@ export default function ProfilesClient({ initial, currentRole }: { initial: Prof
             {!rows.length && (
               <tr>
                 <td colSpan={isAdmin ? 4 : 3} className="px-4 py-10 text-center text-sm text-dark-6">
-                  {loading ? "Loading..." : "No results"}
+                  {loading ? "Yükleniyor..." : "Sonuç bulunamadı"}
                 </td>
               </tr>
             )}

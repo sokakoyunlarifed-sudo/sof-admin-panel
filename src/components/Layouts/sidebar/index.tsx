@@ -69,7 +69,7 @@ export function Sidebar() {
           isMobile ? "fixed bottom-0 top-0 z-50" : "sticky top-0 h-screen",
           isOpen ? "w-full" : "w-0",
         )}
-        aria-label="Main navigation"
+        aria-label="Ana gezinme"
         aria-hidden={!isOpen}
         inert={!isOpen}
       >
@@ -88,7 +88,7 @@ export function Sidebar() {
                 onClick={toggleSidebar}
                 className="absolute left-3/4 right-4.5 top-1/2 -translate-y-1/2 text-right"
               >
-                <span className="sr-only">Close Menu</span>
+                <span className="sr-only">Menüyü Kapat</span>
 
                 <ArrowLeftIcon className="ml-auto size-7" />
               </button>

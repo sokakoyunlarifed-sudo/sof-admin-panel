@@ -19,18 +19,18 @@ export default async function SettingsPage() {
 
   return (
     <div className="mx-auto w-full max-w-[900px]">
-      <h1 className="mb-4 text-xl font-semibold">Settings</h1>
+      <h1 className="mb-4 text-xl font-semibold">Ayarlar</h1>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark xl:col-span-2">
-          <h2 className="mb-3 text-base font-semibold">Account</h2>
+          <h2 className="mb-3 text-base font-semibold">Hesap</h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm">Email</label>
+              <label className="mb-1 block text-sm">E-posta</label>
               <input className="w-full rounded border p-2" value={email} disabled />
             </div>
             <div>
-              <label className="mb-1 block text-sm">Role</label>
+              <label className="mb-1 block text-sm">Rol</label>
               <input className="w-full rounded border p-2" value={effectiveRole} disabled />
             </div>
           </div>
@@ -38,7 +38,7 @@ export default async function SettingsPage() {
 
         <div className="rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">
           <h2 className="mb-3 text-base font-semibold">Avatar</h2>
-          <p className="text-sm text-dark-6">Avatar management is handled in Profiles.</p>
+          <p className="text-sm text-dark-6">Avatar yönetimi Profiller bölümünden yapılır.</p>
         </div>
       </div>
 
@@ -46,8 +46,8 @@ export default async function SettingsPage() {
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="relative overflow-hidden rounded-[14px] border border-primary/20 bg-gradient-to-br from-primary/10 via-transparent to-transparent p-5 shadow-[0_8px_30px_rgb(0,0,0,0.05)] dark:border-primary/30 dark:from-primary/20 xl:col-span-3">
           <div className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-primary/15 blur-2xl dark:bg-primary/25" />
-          <h2 className="mb-2 text-base font-semibold">Trigger Deploy</h2>
-          <p className="mb-3 text-sm text-dark-6">Redeploy the website to refresh static content. Cooldown: 3 minutes.</p>
+          <h2 className="mb-2 text-base font-semibold">Yeniden Yayınla</h2>
+          <p className="mb-3 text-sm text-dark-6">Statik içeriği yenilemek için siteyi yeniden dağıtın. Bekleme süresi: 3 dakika.</p>
           <DeployButton />
         </div>
       </div>
@@ -55,21 +55,21 @@ export default async function SettingsPage() {
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         {role === "admin" ? (
           <div className="rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark xl:col-span-2">
-            <h2 className="mb-3 text-base font-semibold">Change Password</h2>
+            <h2 className="mb-3 text-base font-semibold">Şifre Değiştir</h2>
             <ChangePasswordModal />
           </div>
         ) : null}
 
         <div className="rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">
-          <h2 className="mb-3 text-base font-semibold">Active Sessions</h2>
+          <h2 className="mb-3 text-base font-semibold">Aktif Oturumlar</h2>
           <form action="/api/auth/signout-others" method="post">
-            <p className="mb-3 text-sm text-dark-6">Sign out from other devices and browsers.</p>
+            <p className="mb-3 text-sm text-dark-6">Diğer cihaz ve tarayıcılardan çıkış yapın.</p>
             <button className="rounded-lg border border-stroke px-6 py-[7px] font-medium text-dark hover:shadow-1 dark:border-dark-3 dark:text-white" type="submit">
-              Sign out other sessions
+              Diğer oturumlardan çıkış yap
             </button>
           </form>
           <div className="mt-4">
-            <h3 className="mb-2 text-sm font-medium text-dark-6">Recent logins</h3>
+            <h3 className="mb-2 text-sm font-medium text-dark-6">Son girişler</h3>
             <MyLoginHistory />
           </div>
         </div>
@@ -97,7 +97,7 @@ async function MyLoginHistory() {
           <span className="font-medium">{log.action}</span> • {new Date(log.created_at as any).toLocaleString()} • {log.ip || "-"}
         </li>
       ))}
-      {!data?.length && <li>No history.</li>}
+      {!data?.length && <li>Geçmiş yok.</li>}
     </ul>
   );
 } 

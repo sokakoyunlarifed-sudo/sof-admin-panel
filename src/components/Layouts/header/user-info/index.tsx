@@ -16,7 +16,7 @@ export default function HeaderUserInfo() {
     })();
   }, [supabase]);
 
-  const roleLabel = role === "admin" ? "Admin" : role ? "User" : "";
+  const roleLabel = role === "admin" ? "Admin" : role ? "Kullanıcı" : "";
 
   return <div className="text-sm text-dark-6">{roleLabel}</div>;
 }

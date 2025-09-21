@@ -41,7 +41,7 @@ export function MultiImageUploader({
         onChange(next);
       } catch (e) {
         console.error(e);
-        alert("Upload failed");
+        alert("Yükleme başarısız");
       } finally {
         setUploading(false);
       }
@@ -76,17 +76,17 @@ export function MultiImageUploader({
         {urls.map((u, idx) => (
           <div key={`${u}-${idx}`} className="relative rounded border p-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={u} alt="uploaded" className="h-24 w-full rounded object-cover" />
+            <img src={u} alt="yüklendi" className="h-24 w-full rounded object-cover" />
             <div className="mt-2 flex items-center justify-between">
               <div className="flex items-center gap-1">
-                <button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded border hover:bg-gray-50" onClick={() => move(idx, -1)} aria-label="Move left">
+                <button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded border hover:bg-gray-50" onClick={() => move(idx, -1)} aria-label="Sola taşı">
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded border hover:bg-gray-50" onClick={() => move(idx, 1)} aria-label="Move right">
+                <button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded border hover:bg-gray-50" onClick={() => move(idx, 1)} aria-label="Sağa taşı">
                   <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
-              <button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded border hover:bg-red-50" onClick={() => remove(idx)} aria-label="Remove">
+              <button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded border hover:bg-red-50" onClick={() => remove(idx)} aria-label="Kaldır">
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
@@ -98,7 +98,7 @@ export function MultiImageUploader({
         className="flex h-32 cursor-pointer items-center justify-center rounded border border-dashed border-gray-300 text-sm text-gray-600 hover:bg-gray-50 dark:border-dark-3 dark:text-dark-6"
       >
         <input {...getInputProps()} />
-        {uploading ? "Uploading..." : isDragActive ? "Drop images here" : "Drag & drop or click to upload multiple images"}
+        {uploading ? "Yükleniyor..." : isDragActive ? "Görselleri buraya bırakın" : "Birden fazla görseli yüklemek için sürükleyip bırakın veya tıklayın"}
       </div>
     </div>
   );

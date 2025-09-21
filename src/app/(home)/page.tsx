@@ -46,7 +46,7 @@ export default async function Home({ searchParams }: PropsType) {
     <div>
       {role && (
         <div className="mb-4 rounded-md bg-gray-2 px-3 py-2 text-sm text-dark dark:bg-dark-3 dark:text-dark-6">
-          Signed in as: <strong>{role}</strong>
+          Giriş yapılan rol: <strong>{role}</strong>
         </div>
       )}
 
@@ -56,9 +56,9 @@ export default async function Home({ searchParams }: PropsType) {
 
       {/* Quick actions */}
       <div className="mt-4 flex flex-wrap gap-3">
-        <Link href="/content/news/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>New News</Link>
-        <Link href="/content/announcements/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>New Announcement</Link>
-        <Link href="/content/committees/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>New Committee Member</Link>
+        <Link href="/content/news/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Haber</Link>
+        <Link href="/content/announcements/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Duyuru</Link>
+        <Link href="/content/committees/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Komite Üyesi</Link>
       </div>
 
       {/* Content Overview chart */}
@@ -70,12 +70,12 @@ export default async function Home({ searchParams }: PropsType) {
       <div className="mt-4 grid grid-cols-12 gap-5 md:gap-6">
         <div className="col-span-12 xl:col-span-6">
           <div className="h-full rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">
-            <h3 className="mb-3 text-base font-semibold">Latest News</h3>
+            <h3 className="mb-3 text-base font-semibold">En Son Haberler</h3>
             <ul className="space-y-2">
               {(latestNews || []).map((n) => (
                 <li key={n.id} className="flex items-center justify-between text-sm">
                   <span className="truncate">{n.title}</span>
-                  <Link href={`/content/news/${n.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>Edit</Link>
+                  <Link href={`/content/news/${n.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>Düzenle</Link>
                 </li>
               ))}
             </ul>
@@ -83,12 +83,12 @@ export default async function Home({ searchParams }: PropsType) {
         </div>
         <div className="col-span-12 xl:col-span-6">
           <div className="h-full rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">
-            <h3 className="mb-3 text-base font-semibold">Latest Announcements</h3>
+            <h3 className="mb-3 text-base font-semibold">En Son Duyurular</h3>
             <ul className="space-y-2">
               {(latestAnnouncements || []).map((a) => (
                 <li key={a.id} className="flex items-center justify-between text-sm">
                   <span className="truncate">{a.title}</span>
-                  <Link href={`/content/announcements/${a.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>Edit</Link>
+                  <Link href={`/content/announcements/${a.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>Düzenle</Link>
                 </li>
               ))}
             </ul>
@@ -96,12 +96,12 @@ export default async function Home({ searchParams }: PropsType) {
         </div>
         <div className="col-span-12 xl:col-span-6">
           <div className="h-full rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">
-            <h3 className="mb-3 text-base font-semibold">Latest Committees</h3>
+            <h3 className="mb-3 text-base font-semibold">En Son Komiteler</h3>
             <ul className="space-y-2">
               {(latestCommittees || []).map((c) => (
                 <li key={c.id} className="flex items-center justify-between text-sm">
                   <span className="truncate">{c.name}</span>
-                  <Link href={`/content/committees/${c.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>Edit</Link>
+                  <Link href={`/content/committees/${c.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>Düzenle</Link>
                 </li>
               ))}
             </ul>
@@ -112,7 +112,7 @@ export default async function Home({ searchParams }: PropsType) {
         </div>
         <div className="col-span-12">
           <div className="rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">
-            <h3 className="mb-3 text-base font-semibold">Recent Media</h3>
+            <h3 className="mb-3 text-base font-semibold">Son Medya</h3>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-6">
               {recentFiles.map((m) => (
                 <div key={m.name} className="aspect-square overflow-hidden rounded bg-gray-2 dark:bg-dark-3">

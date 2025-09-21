@@ -21,25 +21,25 @@ export async function OverviewCardsGroup() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4 2xl:gap-7.5">
       <OverviewCard
-        label="News"
+        label="Haberler"
         data={{ value: compactFormat(totalNews) }}
         Icon={icons.Views}
       />
 
       <OverviewCard
-        label="Announcements"
+        label="Duyurular"
         data={{ value: compactFormat(totalAnnouncements) }}
         Icon={icons.Product}
       />
 
       <OverviewCard
-        label="Committees"
+        label="Komiteler"
         data={{ value: compactFormat(totalCommittees) }}
         Icon={icons.Profit}
       />
 
       <OverviewCard
-        label="Users"
+        label="Kullanıcılar"
         data={{ value: compactFormat(totalUsers) }}
         Icon={icons.Users}
       />

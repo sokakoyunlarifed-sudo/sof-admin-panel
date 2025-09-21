@@ -14,14 +14,14 @@ export default async function PublishDistribution() {
   ]);
 
   const items = [
-    { label: "News", value: news },
-    { label: "Announcements", value: announcements },
-    { label: "Committees", value: committees },
+    { label: "Haberler", value: news },
+    { label: "Duyurular", value: announcements },
+    { label: "Komiteler", value: committees },
   ];
 
   return (
     <div className="rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">
-      <h3 className="mb-3 text-base font-semibold">Content Totals</h3>
+      <h3 className="mb-3 text-base font-semibold">İçerik Toplamları</h3>
       <div className="space-y-4">
         {items.map((it) => (
           <div key={it.label} className="flex items-center justify-between text-sm">

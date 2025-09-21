@@ -34,7 +34,7 @@ export function ImageUploader({
       onUploaded(data.publicUrl, path);
     } catch (e) {
       console.error(e);
-      alert("Upload failed");
+      alert("Yükleme başarısız");
     } finally {
       setUploading(false);
     }
@@ -50,14 +50,14 @@ export function ImageUploader({
     <div className="space-y-2">
       {url && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt="Uploaded" className="h-32 w-32 rounded object-cover" />
+        <img src={url} alt="Yüklendi" className="h-32 w-32 rounded object-cover" />
       )}
       <div
         {...getRootProps()}
         className="flex h-32 cursor-pointer items-center justify-center rounded border border-dashed border-gray-300 text-sm text-gray-600 hover:bg-gray-50 dark:border-dark-3 dark:text-dark-6"
       >
         <input {...getInputProps()} />
-        {uploading ? "Uploading..." : isDragActive ? "Drop the image here" : "Drag & drop or click to upload"}
+        {uploading ? "Yükleniyor..." : isDragActive ? "Görseli buraya bırakın" : "Sürükleyip bırakın veya yüklemek için tıklayın"}
       </div>
     </div>
   );

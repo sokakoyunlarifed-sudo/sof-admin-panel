@@ -67,7 +67,7 @@ export default function NewsFormClient({ initial, mode, id }: { initial?: Partia
       }
       router.replace("/content/news");
     } catch (err: any) {
-      setError(err?.message || "Failed to save");
+      setError(err?.message || "Kaydetme başarısız");
     } finally {
       setSaving(false);
     }
@@ -75,7 +75,7 @@ export default function NewsFormClient({ initial, mode, id }: { initial?: Partia
 
   async function handleDelete() {
     if (!id) return;
-    if (!confirm("Delete this article? This cannot be undone.")) return;
+    if (!confirm("Bu haberi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setSaving(true);
     try {
       await supabase.from("news").delete().eq("id", id);
@@ -88,15 +88,15 @@ export default function NewsFormClient({ initial, mode, id }: { initial?: Partia
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">{mode === "new" ? "New Article" : "Edit Article"}</h1>
+        <h1 className="text-xl font-semibold">{mode === "new" ? "Yeni Haber" : "Haberi Düzenle"}</h1>
         <div className="flex gap-2">
           {mode === "edit" && (
             <button className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))} onClick={handleDelete} disabled={saving}>
-              Delete
+              Sil
             </button>
           )}
           <button className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))} onClick={handleSave} disabled={saving}>
-            Save
+            Kaydet
           </button>
         </div>
       </div>
@@ -106,10 +106,10 @@ export default function NewsFormClient({ initial, mode, id }: { initial?: Partia
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
           <div className="rounded border p-4 dark:border-dark-3 space-y-3">
-            <label className="block text-sm">Title</label>
+            <label className="block text-sm">Başlık</label>
             <input className="w-full rounded border p-2" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
 
-            <label className="block text-sm">Date</label>
+            <label className="block text-sm">Tarih</label>
             <input
               type="date"
               className="w-full rounded border p-2"
@@ -117,17 +117,17 @@ export default function NewsFormClient({ initial, mode, id }: { initial?: Partia
               onChange={(e) => setDraft({ ...draft, date: e.target.value || null })}
             />
 
-            <label className="block text-sm">Short Text</label>
+            <label className="block text-sm">Kısa Metin</label>
             <textarea className="w-full rounded border p-2" value={draft.short_text || ""} onChange={(e) => setDraft({ ...draft, short_text: e.target.value || null })} />
 
-            <label className="block text-sm">Full Text</label>
+            <label className="block text-sm">Tam Metin</label>
             <textarea className="min-h-40 w-full rounded border p-2" value={draft.full_text || ""} onChange={(e) => setDraft({ ...draft, full_text: e.target.value || null })} />
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="rounded border p-4 dark:border-dark-3">
-            <h2 className="mb-2 font-medium">Cover Image</h2>
+            <h2 className="mb-2 font-medium">Kapak Görseli</h2>
             <ImageUploader
               folder="news"
               initialUrl={draft.image}

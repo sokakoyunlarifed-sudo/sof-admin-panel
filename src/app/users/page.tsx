@@ -14,7 +14,7 @@ export default async function UsersPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-xl font-semibold">Users</h1>
+      <h1 className="mb-4 text-xl font-semibold">Kullanıcılar</h1>
       <UsersClient profiles={profiles || []} currentRole={role} />
     </div>
   );
