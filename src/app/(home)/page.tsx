@@ -58,7 +58,7 @@ export default async function Home({ searchParams }: PropsType) {
       <div className="mt-4 flex flex-wrap gap-3">
         <Link href="/content/news/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Haber</Link>
         <Link href="/content/announcements/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Duyuru</Link>
-        <Link href="/content/committees/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Komite Üyesi</Link>
+        <Link href="/content/committees/new" className={cn(buttonVariants({ variant: "primary", shape: "rounded", size: "small" }))}>Yeni Kurul Üyesi</Link>
       </div>
 
       {/* Content Overview chart */}
@@ -96,7 +96,7 @@ export default async function Home({ searchParams }: PropsType) {
         </div>
         <div className="col-span-12 xl:col-span-6">
           <div className="h-full rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">
-            <h3 className="mb-3 text-base font-semibold">En Son Komiteler</h3>
+            <h3 className="mb-3 text-base font-semibold">En Son Kurullar</h3>
             <ul className="space-y-2">
               {(latestCommittees || []).map((c) => (
                 <li key={c.id} className="flex items-center justify-between text-sm">

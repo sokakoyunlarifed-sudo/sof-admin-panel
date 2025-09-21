@@ -16,7 +16,7 @@ export const NAV_DATA = [
         items: [
           { title: "Haberler", url: "/content/news", icon: Icons.NewsIcon },
           { title: "Duyurular", url: "/content/announcements", icon: Icons.ProjectsIcon },
-          { title: "Komiteler", url: "/content/committees", icon: Icons.EventsIcon },
+          { title: "Kurullar", url: "/content/committees", icon: Icons.EventsIcon },
         ],
       },
       {

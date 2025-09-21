@@ -33,7 +33,7 @@ export async function OverviewCardsGroup() {
       />
 
       <OverviewCard
-        label="Komiteler"
+        label="Kurullar"
         data={{ value: compactFormat(totalCommittees) }}
         Icon={icons.Profit}
       />

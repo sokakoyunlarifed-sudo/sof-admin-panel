@@ -100,7 +100,7 @@ export function PaymentsOverviewChart({ data }: PropsType) {
             data: data.announcements,
           },
           {
-            name: "Komiteler",
+            name: "Kurullar",
             data: data.committees,
           },
         ]}

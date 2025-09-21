@@ -63,7 +63,7 @@ export async function PaymentsOverview({
           <dt className="text-xl font-bold text-dark dark:text-white">
             {standardFormat(totalCommittees)}
           </dt>
-          <dd className="font-medium dark:text-dark-6">Komiteler (toplam)</dd>
+          <dd className="font-medium dark:text-dark-6">Kurullar (toplam)</dd>
         </div>
       </dl>
     </div>

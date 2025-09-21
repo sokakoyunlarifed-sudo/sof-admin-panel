@@ -46,8 +46,8 @@ export default async function SettingsPage() {
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="relative overflow-hidden rounded-[14px] border border-primary/20 bg-gradient-to-br from-primary/10 via-transparent to-transparent p-5 shadow-[0_8px_30px_rgb(0,0,0,0.05)] dark:border-primary/30 dark:from-primary/20 xl:col-span-3">
           <div className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full bg-primary/15 blur-2xl dark:bg-primary/25" />
-          <h2 className="mb-2 text-base font-semibold">Yeniden Yayınla</h2>
-          <p className="mb-3 text-sm text-dark-6">Statik içeriği yenilemek için siteyi yeniden dağıtın. Bekleme süresi: 3 dakika.</p>
+          <h2 className="mb-2 text-base font-semibold">Siteyi Güncelle</h2>
+          <p className="mb-3 text-sm text-dark-6">Bu butona basarak panelde eklediğiniz, güncellediğiniz veya sildiğiniz içeriklerin sitede (sof.web.tr) görünmesini sağlayabilirsiniz. Bu işlem yaptığınız değişiklikleri siteye uygular. İşlem tamamlanması kısa bir süre alabilir.</p>
           <DeployButton />
         </div>
       </div>

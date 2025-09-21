@@ -16,7 +16,7 @@ export default async function PublishDistribution() {
   const items = [
     { label: "Haberler", value: news },
     { label: "Duyurular", value: announcements },
-    { label: "Komiteler", value: committees },
+    { label: "Kurullar", value: committees },
   ];
 
   return (
