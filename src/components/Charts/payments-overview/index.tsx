@@ -12,8 +12,9 @@ type PropsType = {
 type Point = { x: unknown; y: number };
 
 type Series = {
-  received: Point[];
-  due: Point[];
+  news: Point[];
+  announcements: Point[];
+  committees: Point[];
 };
 
 export async function PaymentsOverview({
@@ -21,6 +22,10 @@ export async function PaymentsOverview({
   className,
 }: PropsType) {
   const data = (await getPaymentsOverviewData(timeFrame)) as Series;
+
+  const totalNews = data.news.reduce((acc: number, { y }) => acc + y, 0);
+  const totalAnnouncements = data.announcements.reduce((acc: number, { y }) => acc + y, 0);
+  const totalCommittees = data.committees.reduce((acc: number, { y }) => acc + y, 0);
 
   return (
     <div
@@ -39,19 +44,26 @@ export async function PaymentsOverview({
 
       <PaymentsOverviewChart data={data} />
 
-      <dl className="grid divide-stroke text-center dark:divide-dark-3 sm:grid-cols-2 sm:divide-x [&>div]:flex [&>div]:flex-col-reverse [&>div]:gap-1">
+      <dl className="grid divide-stroke text-center dark:divide-dark-3 sm:grid-cols-3 sm:divide-x [&>div]:flex [&>div]:flex-col-reverse [&>div]:gap-1">
         <div className="dark:border-dark-3 max-sm:mb-3 max-sm:border-b max-sm:pb-3">
           <dt className="text-xl font-bold text-dark dark:text-white">
-            {standardFormat(data.received.reduce((acc: number, { y }) => acc + y, 0))}
+            {standardFormat(totalNews)}
           </dt>
-          <dd className="font-medium dark:text-dark-6">Published (total)</dd>
+          <dd className="font-medium dark:text-dark-6">News (total)</dd>
+        </div>
+
+        <div className="dark:border-dark-3 max-sm:mb-3 max-sm:border-b max-sm:pb-3">
+          <dt className="text-xl font-bold text-dark dark:text-white">
+            {standardFormat(totalAnnouncements)}
+          </dt>
+          <dd className="font-medium dark:text-dark-6">Announcements (total)</dd>
         </div>
 
         <div>
           <dt className="text-xl font-bold text-dark dark:text-white">
-            {standardFormat(data.due.reduce((acc: number, { y }) => acc + y, 0))}
+            {standardFormat(totalCommittees)}
           </dt>
-          <dd className="font-medium dark:text-dark-6">Drafts (total)</dd>
+          <dd className="font-medium dark:text-dark-6">Committees (total)</dd>
         </div>
       </dl>
     </div>

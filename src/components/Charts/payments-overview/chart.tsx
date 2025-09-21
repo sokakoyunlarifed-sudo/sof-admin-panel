@@ -6,8 +6,9 @@ import dynamic from "next/dynamic";
 
 type PropsType = {
   data: {
-    received: { x: unknown; y: number }[];
-    due: { x: unknown; y: number }[];
+    news: { x: unknown; y: number }[];
+    announcements: { x: unknown; y: number }[];
+    committees: { x: unknown; y: number }[];
   };
 };
 
@@ -20,9 +21,9 @@ export function PaymentsOverviewChart({ data }: PropsType) {
 
   const options: ApexOptions = {
     legend: {
-      show: false,
+      show: true,
     },
-    colors: ["#5750F1", "#0ABEF9"],
+    colors: ["#5750F1", "#0ABEF9", "#22C55E"],
     chart: {
       height: 310,
       type: "area",
@@ -91,12 +92,16 @@ export function PaymentsOverviewChart({ data }: PropsType) {
         options={options}
         series={[
           {
-            name: "Received",
-            data: data.received,
+            name: "News",
+            data: data.news,
           },
           {
-            name: "Due",
-            data: data.due,
+            name: "Announcements",
+            data: data.announcements,
+          },
+          {
+            name: "Committees",
+            data: data.committees,
           },
         ]}
         type="area"

@@ -44,63 +44,116 @@ export async function getPaymentsOverviewData(
 ) {
   const supabase = await getSupabaseServerClient();
 
-  // Build monthly buckets (Jan..Dec) with published vs draft totals across News/Projects/Events
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const startYear = new Date().getFullYear();
-  const start = new Date(startYear, 0, 1);
-  const end = new Date(startYear, 11, 31, 23, 59, 59);
+  // We will produce three series: News, Announcements, Committees
+  // Monthly: buckets Jan..Dec for current year
+  // Yearly: buckets of last 5 years
 
-  const tables = ["news","projects","events"];
-  const publishedQueries = tables.map((t) =>
-    supabase
-      .from(t)
-      .select("created_at,published_at", { head: false })
-      .gte("created_at", start.toISOString())
-      .lte("created_at", end.toISOString()),
-  );
-
-  const results = await Promise.all(publishedQueries);
-
-  const received = months.map((m, idx) => ({ x: m, y: 0 })); // Published
-  const due = months.map((m, idx) => ({ x: m, y: 0 })); // Drafts
-
-  for (const r of results) {
-    (r.data || []).forEach((row: any) => {
-      const d = new Date(row.created_at);
-      const mi = d.getMonth();
-      if (row.published_at) {
-        received[mi].y += 1;
-      } else {
-        due[mi].y += 1;
-      }
-    });
-  }
-
-  // If yearly, aggregate by year (last 5 years)
   if (timeFrame === "yearly") {
     const now = new Date();
-    const years = [now.getFullYear() - 4, now.getFullYear() - 3, now.getFullYear() - 2, now.getFullYear() - 1, now.getFullYear()];
-    const receivedY = years.map((y) => ({ x: y, y: 0 }));
-    const dueY = years.map((y) => ({ x: y, y: 0 }));
+    const years = [
+      now.getFullYear() - 4,
+      now.getFullYear() - 3,
+      now.getFullYear() - 2,
+      now.getFullYear() - 1,
+      now.getFullYear(),
+    ];
 
-    // Fetch all tables for 5 years
-    const yearResults = await Promise.all(
-      tables.map((t) => supabase.from(t).select("created_at,published_at"))
-    );
-    for (const r of yearResults) {
-      (r.data || []).forEach((row: any) => {
-        const y = new Date(row.created_at).getFullYear();
-        const idx = years.indexOf(y);
-        if (idx >= 0) {
-          if (row.published_at) receivedY[idx].y += 1;
-          else dueY[idx].y += 1;
-        }
-      });
-    }
-    return { received: receivedY as any, due: dueY as any };
+    const [newsRes, annRes, comRes] = await Promise.all([
+      supabase.from("news").select("created_at"),
+      // Use announcements.date when available, fallback to created_at
+      supabase.from("announcements").select("date,created_at"),
+      supabase.from("committees").select("created_at"),
+    ]);
+
+    const series = {
+      news: years.map((y) => ({ x: y, y: 0 })),
+      announcements: years.map((y) => ({ x: y, y: 0 })),
+      committees: years.map((y) => ({ x: y, y: 0 })),
+    } as const;
+
+    (newsRes.data || []).forEach((row: any) => {
+      const y = new Date(row.created_at).getFullYear();
+      const idx = years.indexOf(y);
+      if (idx >= 0) series.news[idx].y += 1;
+    });
+
+    (annRes.data || []).forEach((row: any) => {
+      const base = row.date || row.created_at;
+      const y = new Date(base).getFullYear();
+      const idx = years.indexOf(y);
+      if (idx >= 0) series.announcements[idx].y += 1;
+    });
+
+    (comRes.data || []).forEach((row: any) => {
+      const y = new Date(row.created_at).getFullYear();
+      const idx = years.indexOf(y);
+      if (idx >= 0) series.committees[idx].y += 1;
+    });
+
+    return series as any;
   }
 
-  return { received, due };
+  // Default: monthly
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const year = new Date().getFullYear();
+  const start = new Date(year, 0, 1);
+  const end = new Date(year, 11, 31, 23, 59, 59, 999);
+
+  const [newsRes, annRes, comRes] = await Promise.all([
+    supabase
+      .from("news")
+      .select("created_at")
+      .gte("created_at", start.toISOString())
+      .lte("created_at", end.toISOString()),
+    supabase
+      .from("announcements")
+      .select("date,created_at")
+      .gte("created_at", start.toISOString())
+      .lte("created_at", end.toISOString()),
+    supabase
+      .from("committees")
+      .select("created_at")
+      .gte("created_at", start.toISOString())
+      .lte("created_at", end.toISOString()),
+  ]);
+
+  const news = months.map((m) => ({ x: m, y: 0 }));
+  const announcements = months.map((m) => ({ x: m, y: 0 }));
+  const committees = months.map((m) => ({ x: m, y: 0 }));
+
+  (newsRes.data || []).forEach((row: any) => {
+    const d = new Date(row.created_at);
+    const mi = d.getMonth();
+    news[mi].y += 1;
+  });
+
+  (annRes.data || []).forEach((row: any) => {
+    const base = row.date || row.created_at;
+    const d = new Date(base);
+    const mi = d.getMonth();
+    announcements[mi].y += 1;
+  });
+
+  (comRes.data || []).forEach((row: any) => {
+    const d = new Date(row.created_at);
+    const mi = d.getMonth();
+    committees[mi].y += 1;
+  });
+
+  return { news, announcements, committees } as any;
 }
 
 export async function getWeeksProfitData(timeFrame?: string) {
