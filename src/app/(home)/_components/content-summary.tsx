@@ -1,9 +1,8 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { pool } from "@/lib/db";
 
 async function getCount(table: string) {
-  const supabase = await getSupabaseServerClient();
-  const { count } = await supabase.from(table).select("id", { count: "exact", head: true });
-  return count || 0;
+  const { rows } = await pool.query(`SELECT COUNT(id) FROM public.${table}`);
+  return parseInt(rows[0].count, 10) || 0;
 }
 
 export default async function ContentSummary() {
