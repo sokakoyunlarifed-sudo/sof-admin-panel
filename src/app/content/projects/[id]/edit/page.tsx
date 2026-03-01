@@ -1,5 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import ProjectsFormClient from "../../ProjectsFormClient";
+import ProjectFormClient from "../../ProjectFormClient";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +14,11 @@ export default async function EditProjectPage({ params }: { params: Promise<{ id
     .single();
 
   return (
-    <ProjectsFormClient
+    <ProjectFormClient
       mode="edit"
       id={id}
-      initial={data || undefined}
+      initialEn={data || undefined}
+      initialAz={data || undefined}
     />
   );
 }

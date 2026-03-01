@@ -1,5 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import CommitteesFormClient from "../../CommitteesFormClient";
+import CommitteesFormClient from "../../form-client";
 
 export const dynamic = "force-dynamic";
 

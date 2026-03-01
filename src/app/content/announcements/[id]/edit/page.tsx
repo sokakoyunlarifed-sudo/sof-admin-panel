@@ -1,5 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import AnnouncementsFormClient from "../../AnnouncementsFormClient";
+import AnnouncementsFormClient from "../../form-client";
 
 export const dynamic = "force-dynamic";
 

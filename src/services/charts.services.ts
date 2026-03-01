@@ -188,3 +188,20 @@ export async function getWeeksProfitData(timeFrame?: string) {
 
   return { sales, revenue };
 }
+
+export async function getCampaignVisitorsData() {
+  // Fake data for now to fix build
+  return {
+    total_visitors: 12500,
+    performance: 12.5,
+    chart: [
+      { day: "Mon", visitors: 400 },
+      { day: "Tue", visitors: 800 },
+      { day: "Wed", visitors: 600 },
+      { day: "Thu", visitors: 1000 },
+      { day: "Fri", visitors: 900 },
+      { day: "Sat", visitors: 1200 },
+      { day: "Sun", visitors: 1100 },
+    ],
+  };
+}

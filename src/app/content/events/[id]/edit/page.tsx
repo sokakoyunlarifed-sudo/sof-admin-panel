@@ -1,5 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import EventsFormClient from "../../EventsFormClient";
+import EventFormClient from "../../EventFormClient";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +14,11 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
     .single();
 
   return (
-    <EventsFormClient
+    <EventFormClient
       mode="edit"
       id={id}
-      initial={data || undefined}
+      initialEn={data || undefined}
+      initialAz={data || undefined}
     />
   );
 }
