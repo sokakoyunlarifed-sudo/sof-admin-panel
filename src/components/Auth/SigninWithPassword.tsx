@@ -3,7 +3,7 @@ import { EmailIcon, PasswordIcon } from "@/assets/icons";
 import React, { useState } from "react";
 import InputGroup from "../FormElements/InputGroup";
 import { Checkbox } from "../FormElements/checkbox";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+
 import { useRouter } from "next/navigation";
 
 export default function SigninWithPassword() {
@@ -29,21 +29,18 @@ export default function SigninWithPassword() {
     setError(null);
     setLoading(true);
     try {
-      const supabase = getSupabaseBrowserClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, password: data.password }),
       });
-      if (signInError) {
-        setError(signInError.message);
+      const result = await res.json();
+
+      if (!res.ok) {
+        setError(result.error || "Giriş başarısız oldu");
       } else {
-        // fire and forget audit
-        fetch("/api/audit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "login", entity_type: "auth" }),
-        }).catch(() => {});
         router.replace("/");
+        router.refresh();
       }
     } catch (err: any) {
       setError(err?.message || "Beklenmeyen bir hata oluştu");
