@@ -13,12 +13,9 @@ function isPublicAsset(pathname: string) {
     pathname === "/favicon.ico" ||
     pathname.startsWith("/images") ||
     pathname.startsWith("/public") ||
-    pathname.startsWith("/logo")
+    pathname.startsWith("/logo") ||
+    pathname.startsWith("/api")
   );
-}
-
-function getWebsiteURL() {
-  return process.env.NEXT_PUBLIC_PUBLIC_WEBSITE_URL || "/auth/sign-in";
 }
 
 export async function middleware(req: NextRequest) {
@@ -26,16 +23,6 @@ export async function middleware(req: NextRequest) {
 
   if (isPublicAsset(pathname)) {
     return NextResponse.next();
-  }
-
-  // If not an auth path and no auth cookie, redirect immediately
-  if (!isAuthPath(pathname)) {
-    const hasAccessToken = req.cookies.has("sb-access-token");
-    const hasRefreshToken = req.cookies.has("sb-refresh-token");
-    if (!hasAccessToken || !hasRefreshToken) {
-      const url = new URL("/auth/sign-in", req.url);
-      return NextResponse.redirect(url);
-    }
   }
 
   const res = NextResponse.next();
@@ -62,43 +49,28 @@ export async function middleware(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Allow auth pages for unauthenticated
   if (isAuthPath(pathname)) {
     if (user) {
-      // If logged in and tries to visit sign-in, redirect to home
       return NextResponse.redirect(new URL("/", req.url));
     }
     return res;
   }
 
-  // For all other pages, require auth and role guard
   if (!user) {
     return NextResponse.redirect(new URL("/auth/sign-in", req.url));
-  }
-
-  // Fetch profile with RLS (user can read own)
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  const role = profile?.role as "user" | "admin" | "superadmin" | undefined;
-
-  if (!role || (role !== "admin" && role !== "superadmin")) {
-    // not allowed in admin panel, redirect to main site
-    return NextResponse.redirect(new URL(getWebsiteURL(), req.url));
-  }
-
-  // superadmin-only sections guard
-  const superAdminOnly = ["/users", "/system"]; // exact prefixes
-  if (superAdminOnly.some((p) => pathname.startsWith(p)) && role !== "superadmin") {
-    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return res;
 }
 
 export const config = {
-  matcher: "/:path*",
-}; 
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
+};
