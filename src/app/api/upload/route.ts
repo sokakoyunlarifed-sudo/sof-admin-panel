@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { s3, BUCKET_NAME } from '@/lib/s3';
+import { s3, BUCKET_NAME, PUBLIC_ENDPOINT } from '@/lib/s3';
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 import { extname } from 'path';
@@ -31,8 +31,7 @@ export async function POST(req: NextRequest) {
         }));
 
         // Generate public URL based on endpoint
-        const url = new URL(s3.config.endpoint as any);
-        const publicUrl = `${url.origin}/${BUCKET_NAME}/${key}`;
+        const publicUrl = `${PUBLIC_ENDPOINT}/${key}`;
 
         return NextResponse.json({ url: publicUrl });
 
