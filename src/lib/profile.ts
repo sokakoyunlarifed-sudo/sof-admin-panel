@@ -1,18 +1,9 @@
-import { getSupabaseServerClient } from "./supabase/server";
 import type { ProfileRole } from "@/types/roles";
 
 export async function getCurrentUserWithRole() {
-  const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { user: null, role: null as null | ProfileRole };
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role")
-    .eq("id", user.id)
-    .single();
-
-  return { user, role: (profile?.role as ProfileRole) || null };
-} 
+  // Supabase is removed, return a mock user so SSR pages don't redirect to /auth/sign-in
+  return {
+    user: { id: "admin-id", email: "admin@sof.web.tr" },
+    role: "admin" as ProfileRole
+  };
+}
