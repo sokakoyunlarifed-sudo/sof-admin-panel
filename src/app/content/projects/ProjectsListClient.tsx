@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { getPublicUrl } from "@/lib/utils/image";
 
 export type Role = "user" | "admin" | "superadmin" | null;
 
@@ -109,7 +110,7 @@ export default function ProjectsListClient({ initial, role }: { initial: Project
                   <div className="flex items-center gap-3">
                     {n.image_url && (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={n.image_url} alt="thumb" className="h-10 w-10 rounded object-cover" />
+                      <img src={getPublicUrl(n.image_url)} alt="thumb" className="h-10 w-10 rounded object-cover" />
                     )}
                     <div>
                       <div className="truncate font-medium">{n.title}</div>

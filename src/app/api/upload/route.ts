@@ -36,7 +36,10 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ url: publicUrl });
 
     } catch (error: any) {
-        console.error('Upload Error:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('Upload API Error:', error);
+        return NextResponse.json({
+            error: error.message || 'Yükleme başarısız',
+            details: error.name === 'NoSuchBucket' ? 'Belirtilen bucket bulunamadı' : error.message
+        }, { status: 500 });
     }
 }
