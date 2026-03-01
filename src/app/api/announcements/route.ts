@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pool } from '@/lib/db';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function GET(req: NextRequest) {
     try {
-        const result = await pool.query(
-            `SELECT id, title, date, location, description, image FROM public.announcements ORDER BY date DESC`
-        );
-        return NextResponse.json(result.rows);
+        const supabase = await getSupabaseServerClient();
+        const { data, error } = await supabase
+            .from('announcements')
+            .select('*')
+            .order('date', { ascending: false });
+
+        if (error) throw error;
+        return NextResponse.json(data);
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
@@ -14,15 +18,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
+        const supabase = await getSupabaseServerClient();
         const body = await req.json();
         const { title, date, location, description, image } = body;
 
-        const result = await pool.query(
-            `INSERT INTO public.announcements (title, date, location, description, image) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-            [title || '', date || null, location || '', description || '', image || '']
-        );
+        const { data, error } = await supabase
+            .from('announcements')
+            .insert([{ title, date, location, description, image }])
+            .select()
+            .single();
 
-        return NextResponse.json(result.rows[0]);
+        if (error) throw error;
+        return NextResponse.json(data);
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

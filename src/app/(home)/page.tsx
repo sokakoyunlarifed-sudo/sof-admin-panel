@@ -10,7 +10,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { PaymentsOverview } from "@/components/Charts/payments-overview";
-import { pool } from "@/lib/db";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { s3 } from "@/lib/s3";
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
 
@@ -32,17 +32,18 @@ export default async function Home({ searchParams }: PropsType) {
   const extractTimeFrame = createTimeFrameExtractor(selected_time_frame);
 
   const bucket = process.env.S3_BUCKET || "sof-media";
+  const supabase = await getSupabaseServerClient();
 
   const [resNews, resAnnouncements, resCommittees, resMedia] = await Promise.all([
-    pool.query("SELECT id,title,created_at FROM public.news ORDER BY created_at DESC LIMIT 3"),
-    pool.query("SELECT id,title,date,created_at FROM public.announcements ORDER BY date DESC LIMIT 3"),
-    pool.query("SELECT id,name,created_at FROM public.committees ORDER BY created_at DESC LIMIT 3"),
+    supabase.from("news").select("id,title,created_at").order("created_at", { ascending: false }).limit(3),
+    supabase.from("announcements").select("id,title,date,created_at").order("date", { ascending: false }).limit(3),
+    supabase.from("committees").select("id,name,created_at").order("created_at", { ascending: false }).limit(3),
     s3.send(new ListObjectsV2Command({ Bucket: bucket, MaxKeys: 24, Prefix: "" })).catch(() => ({ Contents: [] })),
   ]);
 
-  const latestNews = resNews.rows || [];
-  const latestAnnouncements = resAnnouncements.rows || [];
-  const latestCommittees = resCommittees.rows || [];
+  const latestNews = resNews.data || [];
+  const latestAnnouncements = resAnnouncements.data || [];
+  const latestCommittees = resCommittees.data || [];
   const mediaList = resMedia.Contents || [];
 
   const recentFiles = mediaList.filter((m: any) => (m.Key || "").includes(".")).slice(0, 12);

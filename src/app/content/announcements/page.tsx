@@ -1,25 +1,18 @@
 import { redirect } from "next/navigation";
 import AnnouncementsListClient, { AnnouncementRow } from "./AnnouncementsListClient";
 import { getCurrentUserWithRole } from "@/lib/profile";
-import { pool } from "@/lib/db";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function AnnouncementsListPage() {
   const { role } = await getCurrentUserWithRole();
-  let announcements: any[] = [];
-  try {
-    const result = await pool.query(
-      "SELECT id, title, date, location, description, image, created_at FROM public.announcements ORDER BY created_at DESC"
-    );
-    announcements = result.rows.map((row: any) => ({
-      ...row,
-      date: row.date ? new Date(row.date).toISOString() : null,
-      created_at: row.created_at ? new Date(row.created_at).toISOString() : null,
-    }));
-  } catch (err) {
-    console.error("AnnouncementsListPage Error:", err);
-  }
+  const supabase = await getSupabaseServerClient();
+
+  const { data: announcements } = await supabase
+    .from("announcements")
+    .select("id, title, date, location, description, image, created_at")
+    .order("created_at", { ascending: false });
 
   if (!role) redirect("/auth/sign-in");
   if (role !== "admin") redirect("/");

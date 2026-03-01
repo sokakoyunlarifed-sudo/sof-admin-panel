@@ -1,9 +1,12 @@
-import { pool } from "@/lib/db";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function LatestAnnouncements() {
-  const { rows: data } = await pool.query(
-    `SELECT id, title, date, location FROM public.announcements ORDER BY date DESC LIMIT 6`
-  );
+  const supabase = await getSupabaseServerClient();
+  const { data } = await supabase
+    .from("announcements")
+    .select("id,title,date,location")
+    .order("date", { ascending: false })
+    .limit(6);
 
   return (
     <div className="flex h-full flex-col rounded-[10px] bg-white p-5 shadow-1 dark:bg-gray-dark">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
-const PUBLIC_AUTH_PATHS = ["/auth/sign-in"];
+const PUBLIC_AUTH_PATHS = ["/auth/sign-in", "/auth/forgot-password", "/auth/reset-password"];
 
 function isAuthPath(pathname: string) {
   return PUBLIC_AUTH_PATHS.some((p) => pathname.startsWith(p));
@@ -12,9 +13,12 @@ function isPublicAsset(pathname: string) {
     pathname === "/favicon.ico" ||
     pathname.startsWith("/images") ||
     pathname.startsWith("/public") ||
-    pathname.startsWith("/logo") ||
-    pathname.startsWith("/api")
+    pathname.startsWith("/logo")
   );
+}
+
+function getWebsiteURL() {
+  return process.env.NEXT_PUBLIC_PUBLIC_WEBSITE_URL || "/auth/sign-in";
 }
 
 export async function middleware(req: NextRequest) {
@@ -24,26 +28,56 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = req.cookies.get("sof_admin_session")?.value;
-  const expectedToken = process.env.ADMIN_SESSION_SECRET || "fallback_secret_token_123!";
-  const isAuthenticated = token === expectedToken;
+  const res = NextResponse.next();
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return req.cookies.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          res.cookies.set({ name, value, ...options });
+        },
+        remove(name: string, options: CookieOptions) {
+          res.cookies.set({ name, value: "", ...options });
+        },
+      },
+    }
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (isAuthPath(pathname)) {
-    if (isAuthenticated) {
+    if (user) {
       return NextResponse.redirect(new URL("/", req.url));
     }
-    return NextResponse.next();
+    return res;
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return NextResponse.redirect(new URL("/auth/sign-in", req.url));
   }
 
-  return NextResponse.next();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  const role = profile?.role as "user" | "admin" | "superadmin" | undefined;
+
+  if (!role || (role !== "admin" && role !== "superadmin")) {
+    return NextResponse.redirect(new URL(getWebsiteURL(), req.url));
+  }
+
+  return res;
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: "/:path*",
 };

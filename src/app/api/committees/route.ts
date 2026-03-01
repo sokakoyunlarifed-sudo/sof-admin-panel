@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { pool } from '@/lib/db';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function GET(req: NextRequest) {
     try {
-        const result = await pool.query(
-            `SELECT id, name, role, image FROM public.committees ORDER BY name ASC`
-        );
-        return NextResponse.json(result.rows);
+        const supabase = await getSupabaseServerClient();
+        const { data, error } = await supabase
+            .from('committees')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return NextResponse.json(data);
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
@@ -14,15 +18,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
+        const supabase = await getSupabaseServerClient();
         const body = await req.json();
-        const { name, role, image } = body;
+        const { name, role, description, image } = body;
 
-        const result = await pool.query(
-            `INSERT INTO public.committees (name, role, image) VALUES ($1, $2, $3) RETURNING id`,
-            [name || '', role || '', image || '']
-        );
+        const { data, error } = await supabase
+            .from('committees')
+            .insert([{ name, role, description, image }])
+            .select()
+            .single();
 
-        return NextResponse.json(result.rows[0]);
+        if (error) throw error;
+        return NextResponse.json(data);
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

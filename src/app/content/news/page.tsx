@@ -1,26 +1,18 @@
 import { redirect } from "next/navigation";
 import NewsListClient, { NewsRow } from "./NewsListClient";
 import { getCurrentUserWithRole } from "@/lib/profile";
-import { pool } from "@/lib/db";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewsListPage() {
   const { role } = await getCurrentUserWithRole();
+  const supabase = await getSupabaseServerClient();
 
-  let news: any[] = [];
-  try {
-    const result = await pool.query(
-      "SELECT id, title, date, created_at, image FROM public.news ORDER BY created_at DESC"
-    );
-    news = result.rows.map((row: any) => ({
-      ...row,
-      date: row.date ? new Date(row.date).toISOString() : null,
-      created_at: row.created_at ? new Date(row.created_at).toISOString() : null,
-    }));
-  } catch (err) {
-    console.error("NewsListPage Error:", err);
-  }
+  const { data: news } = await supabase
+    .from("news")
+    .select("id, title, date, created_at, image")
+    .order("created_at", { ascending: false });
 
   if (!role) redirect("/auth/sign-in");
   if (role !== "admin") redirect("/");
