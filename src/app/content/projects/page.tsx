@@ -15,7 +15,7 @@ export default async function ProjectsListPage() {
     .order("created_at", { ascending: false });
 
   if (!role) redirect("/auth/sign-in");
-  if (role !== "admin") redirect("/");
+  if (role !== "admin" && role !== "superadmin") redirect("/");
 
   return <ProjectsListClient initial={(data as ProjectRow[]) || []} role={role} />;
 }

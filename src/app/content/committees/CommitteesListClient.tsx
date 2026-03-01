@@ -5,7 +5,7 @@ import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-export type Role = "user" | "admin" | null;
+export type Role = "user" | "admin" | "superadmin" | null;
 
 export type CommitteeRow = {
   id: string;
@@ -92,7 +92,7 @@ export default function CommitteesListClient({ initial, role }: { initial: Commi
                     <Link href={`/content/committees/${n.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>
                       Düzenle
                     </Link>
-                    {role === "admin" && (
+                    {(role === "admin" || role === "superadmin") && (
                       <button onClick={() => remove(n.id)} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))} disabled={loading}>
                         Sil
                       </button>

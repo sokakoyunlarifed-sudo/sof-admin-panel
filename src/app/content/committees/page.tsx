@@ -15,7 +15,7 @@ export default async function CommitteesListPage() {
     .order("created_at", { ascending: false });
 
   if (!role) redirect("/auth/sign-in");
-  if (role !== "admin") redirect("/");
+  if (role !== "admin" && role !== "superadmin") redirect("/");
 
   return <CommitteesListClient initial={(committees as unknown as CommitteeRow[]) || []} role={role} />;
 }

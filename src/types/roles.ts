@@ -1,1 +1,1 @@
-export type ProfileRole = "user" | "admin"; 
+export type ProfileRole = "user" | "admin" | "superadmin"; 

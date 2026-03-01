@@ -5,7 +5,7 @@ import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-export type Role = "user" | "admin" | null;
+export type Role = "user" | "admin" | "superadmin" | null;
 
 export type AnnouncementRow = {
   id: string;
@@ -100,7 +100,7 @@ export default function AnnouncementsListClient({ initial, role }: { initial: An
                     <Link href={`/content/announcements/${n.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>
                       Düzenle
                     </Link>
-                    {role === "admin" && (
+                    {(role === "admin" || role === "superadmin") && (
                       <button onClick={() => remove(n.id)} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))} disabled={loading}>
                         Sil
                       </button>

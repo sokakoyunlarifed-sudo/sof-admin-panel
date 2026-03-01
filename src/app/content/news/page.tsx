@@ -15,7 +15,7 @@ export default async function NewsListPage() {
     .order("created_at", { ascending: false });
 
   if (!role) redirect("/auth/sign-in");
-  if (role !== "admin") redirect("/");
+  if (role !== "admin" && role !== "superadmin") redirect("/");
 
   return <NewsListClient initial={(news as unknown as NewsRow[]) || []} role={role} />;
 }

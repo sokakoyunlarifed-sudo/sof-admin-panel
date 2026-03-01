@@ -15,7 +15,7 @@ export default async function AnnouncementsListPage() {
     .order("created_at", { ascending: false });
 
   if (!role) redirect("/auth/sign-in");
-  if (role !== "admin") redirect("/");
+  if (role !== "admin" && role !== "superadmin") redirect("/");
 
   return <AnnouncementsListClient initial={(announcements as unknown as AnnouncementRow[]) || []} role={role} />;
 }

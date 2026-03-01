@@ -5,7 +5,7 @@ import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-type Role = "user" | "admin" | null;
+type Role = "user" | "admin" | "superadmin" | null;
 
 export type NewsRow = {
   id: string;
@@ -102,7 +102,7 @@ export default function NewsListClient({ initial, role }: { initial: NewsRow[]; 
                     <Link href={`/content/news/${n.id}/edit`} className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}>
                       Düzenle
                     </Link>
-                    {role === "admin" && (
+                    {(role === "admin" || role === "superadmin") && (
                       <button
                         onClick={() => remove(n.id)}
                         className={cn(buttonVariants({ variant: "outlineDark", shape: "rounded", size: "small" }))}

@@ -41,7 +41,7 @@ stable
 as $$
   select exists (
     select 1 from public.profiles p
-    where p.id = auth.uid() and p.role = 'admin'
+    where p.id = auth.uid() and (p.role = 'admin' or p.role = 'superadmin')
   );
 $$;
 

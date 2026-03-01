@@ -15,7 +15,7 @@ export default async function EventsListPage() {
     .order("created_at", { ascending: false });
 
   if (!role) redirect("/auth/sign-in");
-  if (role !== "admin") redirect("/");
+  if (role !== "admin" && role !== "superadmin") redirect("/");
 
   return <EventsListClient initial={(data as EventRow[]) || []} role={role} />;
 }
