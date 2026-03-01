@@ -195,13 +195,13 @@ export async function getCampaignVisitorsData() {
     total_visitors: 12500,
     performance: 12.5,
     chart: [
-      { day: "Mon", visitors: 400 },
-      { day: "Tue", visitors: 800 },
-      { day: "Wed", visitors: 600 },
-      { day: "Thu", visitors: 1000 },
-      { day: "Fri", visitors: 900 },
-      { day: "Sat", visitors: 1200 },
-      { day: "Sun", visitors: 1100 },
+      { x: "Mon", y: 400 },
+      { x: "Tue", y: 800 },
+      { x: "Wed", y: 600 },
+      { x: "Thu", y: 1000 },
+      { x: "Fri", y: 900 },
+      { x: "Sat", y: 1200 },
+      { x: "Sun", y: 1100 },
     ],
   };
 }

@@ -1,5 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import CommitteesFormClient from "../../form-client";
+import CommitteeFormClient from "../../CommitteeFormClient";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export default async function EditCommitteePage({ params }: { params: Promise<{ 
     .single();
 
   return (
-    <CommitteesFormClient
+    <CommitteeFormClient
       mode="edit"
       id={id}
       initial={data || undefined}

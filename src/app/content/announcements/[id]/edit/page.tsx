@@ -1,5 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import AnnouncementsFormClient from "../../form-client";
+import AnnouncementFormClient from "../../AnnouncementFormClient";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +14,7 @@ export default async function EditAnnouncementPage({ params }: { params: Promise
     .single();
 
   return (
-    <AnnouncementsFormClient
+    <AnnouncementFormClient
       mode="edit"
       id={id}
       initial={data || undefined}
