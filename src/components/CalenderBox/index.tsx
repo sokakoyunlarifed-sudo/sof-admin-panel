@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui-elements/button";
@@ -27,7 +26,6 @@ function fmtKey(d: Date) {
 }
 
 export default function CalendarBox() {
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
   const [anchorDate, setAnchorDate] = useState<Date>(() => startOfMonth(new Date()));
   const [itemsByDay, setItemsByDay] = useState<Record<string, Item[]>>({});
   const [loading, setLoading] = useState(false);
@@ -64,14 +62,14 @@ export default function CalendarBox() {
       try {
         const fromIso = new Date(monthStart.getFullYear(), monthStart.getMonth(), 1).toISOString();
         const toIso = new Date(monthEnd.getFullYear(), monthEnd.getMonth(), monthEnd.getDate(), 23, 59, 59, 999).toISOString();
-        const { data } = await supabase
-          .from("announcements")
-          .select("id,title,location,date")
-          .gte("date", fromIso)
-          .lte("date", toIso)
-          .order("date", { ascending: true });
+        const res = await fetch("/api/announcements");
+        let data = await res.json();
+
+        // Filter client-side
+        data = data.filter((e: any) => e.date && e.date >= fromIso && e.date <= toIso);
+
         const byDay: Record<string, Item[]> = {};
-        for (const e of data || []) {
+        for (const e of data) {
           if (!e.date) continue;
           const key = fmtKey(new Date(e.date));
           if (!byDay[key]) byDay[key] = [];
@@ -152,7 +150,7 @@ export default function CalendarBox() {
                 const isToday = key === todayKey;
                 const dayItems = itemsByDay[key] || [];
                 return (
-                  <td key={key} className={cn("ease relative h-24 cursor-pointer border border-stroke p-2 align-top transition duration-300 hover:bg-gray-2 dark:border-dark-3 dark:hover:bg-dark-2 md:h-28 md:p-3 xl:h-32", !inMonth && "opacity-50")}> 
+                  <td key={key} className={cn("ease relative h-24 cursor-pointer border border-stroke p-2 align-top transition duration-300 hover:bg-gray-2 dark:border-dark-3 dark:hover:bg-dark-2 md:h-28 md:p-3 xl:h-32", !inMonth && "opacity-50")}>
                     <span className={cn("inline-flex items-center gap-2 font-medium", isToday && "rounded bg-primary/10 px-1 text-primary")}>{date.getDate()}</span>
                     <div className="mt-1 space-y-1">
                       {dayItems.slice(0, 2).map((e) => (

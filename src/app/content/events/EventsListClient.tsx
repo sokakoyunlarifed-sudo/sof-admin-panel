@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -25,22 +24,17 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"all" | "published" | "draft">("all");
 
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
-
   async function load() {
     setLoading(true);
     try {
-      let query = supabase
-        .from("events")
-        .select("id,title,location,event_date,published_at,created_at,updated_at,image_url")
-        .order("created_at", { ascending: false });
+      const res = await fetch("/api/events");
+      let data = await res.json();
       if (search) {
-        query = query.or(`title.ilike.%${search}%,location.ilike.%${search}%`);
+        data = data.filter((n: any) => n.title.toLowerCase().includes(search.toLowerCase()) || (n.location && n.location.toLowerCase().includes(search.toLowerCase())));
       }
-      if (status === "published") query = query.not("published_at", "is", null);
-      if (status === "draft") query = query.is("published_at", null);
-      const { data } = await query;
-      setRows((data || []) as any);
+      if (status === "published") data = data.filter((n: any) => n.published_at !== null);
+      if (status === "draft") data = data.filter((n: any) => n.published_at === null);
+      setRows(data);
     } finally {
       setLoading(false);
     }
@@ -54,11 +48,8 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
   async function togglePublish(id: string, publish: boolean) {
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from("events")
-        .update({ published_at: publish ? new Date().toISOString() : null })
-        .eq("id", id);
-      if (!error) await load();
+      const res = await fetch(`/api/events/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ togglePublish: true, published_at: publish ? new Date().toISOString() : null }) });
+      if (res.ok) await load();
     } finally {
       setLoading(false);
     }
@@ -68,8 +59,8 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
     if (!confirm("Bu etkinliği silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setLoading(true);
     try {
-      const { error } = await supabase.from("events").delete().eq("id", id);
-      if (!error) setRows((r) => r.filter((x) => x.id !== id));
+      const res = await fetch(`/api/events/${id}`, { method: "DELETE" });
+      if (res.ok) setRows((r) => r.filter((x) => x.id !== id));
     } finally {
       setLoading(false);
     }
@@ -183,4 +174,4 @@ export default function EventsListClient({ initial, role }: { initial: EventRow[
       </div>
     </div>
   );
-} 
+}

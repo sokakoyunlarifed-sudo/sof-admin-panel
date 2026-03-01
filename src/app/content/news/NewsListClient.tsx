@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -21,20 +20,16 @@ export default function NewsListClient({ initial, role }: { initial: NewsRow[]; 
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
 
   async function load() {
     setLoading(true);
     try {
-      let query = supabase
-        .from("news")
-        .select("id,title,date,created_at,image")
-        .order("created_at", { ascending: false });
+      const res = await fetch("/api/news");
+      let data = await res.json();
       if (search) {
-        query = query.ilike("title", `%${search}%`);
+        data = data.filter((n: any) => n.title.toLowerCase().includes(search.toLowerCase()));
       }
-      const { data } = await query;
-      setRows((data || []) as any);
+      setRows(data);
     } finally {
       setLoading(false);
     }
@@ -49,8 +44,8 @@ export default function NewsListClient({ initial, role }: { initial: NewsRow[]; 
     if (!confirm("Bu haberi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setLoading(true);
     try {
-      const { error } = await supabase.from("news").delete().eq("id", id);
-      if (!error) setRows((r) => r.filter((x) => x.id !== id));
+      const res = await fetch(`/api/news/${id}`, { method: "DELETE" });
+      if (res.ok) setRows((r) => r.filter((x) => x.id !== id));
     } finally {
       setLoading(false);
     }

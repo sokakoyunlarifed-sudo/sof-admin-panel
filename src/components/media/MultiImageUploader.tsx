@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 
 export function MultiImageUploader({
@@ -16,8 +15,6 @@ export function MultiImageUploader({
 }) {
   const [uploading, setUploading] = useState(false);
   const [urls, setUrls] = useState<string[]>(() => initialUrls?.filter(Boolean) ?? []);
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
-
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       if (!acceptedFiles.length) return;
@@ -25,16 +22,17 @@ export function MultiImageUploader({
       try {
         const uploaded: string[] = [];
         for (const file of acceptedFiles) {
-          const ext = file.name.split(".").pop() || "png";
-          const random = Math.random().toString(36).slice(2, 8);
-          const timestamp = Date.now();
-          const path = `${folder}/${timestamp}-${random}.${ext}`;
-          const { error: uploadError } = await supabase.storage
-            .from("mediaa")
-            .upload(path, file, { cacheControl: "3600", upsert: false });
-          if (uploadError) throw uploadError;
-          const { data } = supabase.storage.from("mediaa").getPublicUrl(path);
-          uploaded.push(data.publicUrl);
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("folder", folder);
+
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+          if (!res.ok) throw new Error("Yükleme başarısız");
+          const data = await res.json();
+          uploaded.push(data.url);
         }
         const next = [...urls, ...uploaded];
         setUrls(next);
@@ -46,7 +44,7 @@ export function MultiImageUploader({
         setUploading(false);
       }
     },
-    [folder, supabase, urls, onChange]
+    [folder, urls, onChange]
   );
 
   const move = (idx: number, dir: -1 | 1) => {

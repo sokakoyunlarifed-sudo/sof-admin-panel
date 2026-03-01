@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useEffect, useState } from "react";
 import { ImageUploader } from "@/components/media/ImageUploader";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
@@ -14,20 +13,16 @@ type MediaItem = {
   path: string;
   url: string;
   updated_at?: string | null;
-  created_at?: string | null;
   size?: number | null;
 };
 
 const FOLDERS = ["all", "news", "projects", "events", "uploads"] as const;
 
 type Folder = typeof FOLDERS[number];
-
 type SortCol = "name" | "updated_at";
-
 type SortOrder = "asc" | "desc";
 
 export default function MediaLibraryClient() {
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
   const [items, setItems] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<ViewMode>("grid");
@@ -38,9 +33,7 @@ export default function MediaLibraryClient() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(24);
   const [total, setTotal] = useState(0);
-  const [usageBytes, setUsageBytes] = useState<number | null>(null);
 
-  // New UX states
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -50,50 +43,35 @@ export default function MediaLibraryClient() {
   async function load() {
     setLoading(true);
     try {
-      const from = (page - 1) * pageSize;
-      const options: any = {
-        limit: pageSize,
-        offset: from,
-        sortBy: { column: sortCol, order: sortOrder },
-        search: search || undefined,
-      };
-      const { data, error } = await supabase.storage.from("mediaa").list(prefix, options);
-      if (error) throw error;
-      const mapped: MediaItem[] = (data || []).map((i: any) => {
-        const path = prefix ? `${prefix}/${i.name}` : i.name;
-        const { data: urlData } = supabase.storage.from("mediaa").getPublicUrl(path);
-        const size = i?.metadata?.size ?? null;
-        return {
-          id: i.id || path,
-          name: i.name,
-          path,
-          url: urlData.publicUrl,
-          updated_at: i.updated_at || null,
-          created_at: i.created_at || null,
-          size,
-        };
+      const qs = new URLSearchParams();
+      if (prefix) qs.set("prefix", prefix);
+
+      const res = await fetch(`/api/media?${qs.toString()}`);
+      const data = await res.json();
+      let mapped: MediaItem[] = data.items || [];
+
+      if (search) {
+        mapped = mapped.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()));
+      }
+
+      mapped.sort((a, b) => {
+        if (sortCol === "name") return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        if (sortCol === "updated_at") {
+          const ta = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+          const tb = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+          return sortOrder === "asc" ? ta - tb : tb - ta;
+        }
+        return 0;
       });
-      setItems(mapped);
+
+      setTotal(mapped.length);
+      const from = (page - 1) * pageSize;
+      setItems(mapped.slice(from, from + pageSize));
       setSelected(new Set());
-      setTotal(from + mapped.length + (mapped.length === pageSize ? pageSize : 0));
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function loadUsage() {
-    try {
-      let sum = 0;
-      for (const f of FOLDERS) {
-        const p = f === "all" ? "" : f;
-        const { data } = await supabase.storage.from("media").list(p, { limit: 1000 });
-        for (const it of data || []) sum += (it as any)?.metadata?.size ?? 0;
-      }
-      setUsageBytes(sum);
-    } catch (e) {
-      // ignore
     }
   }
 
@@ -102,17 +80,9 @@ export default function MediaLibraryClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [folder, search, sortCol, sortOrder, page]);
 
-  useEffect(() => {
-    loadUsage();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   function onUploaded(url: string, path: string) {
-    const inFolder = !prefix || path.startsWith(`${prefix}/`) || path === prefix;
-    if (inFolder) {
-      setPage(1);
-      load();
-    }
+    setPage(1);
+    load();
   }
 
   function toggleSelect(path: string) {
@@ -135,9 +105,13 @@ export default function MediaLibraryClient() {
   async function bulkDelete() {
     if (!selected.size) return;
     if (!confirm(`Delete ${selected.size} file(s)? This cannot be undone.`)) return;
-    await supabase.storage.from("mediaa").remove(Array.from(selected));
+
+    await fetch("/api/media", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paths: Array.from(selected) })
+    });
     await load();
-    await loadUsage();
   }
 
   async function bulkCopyUrls() {
@@ -151,13 +125,22 @@ export default function MediaLibraryClient() {
 
   async function handleDelete(path: string) {
     if (!confirm("Delete this file? This cannot be undone.")) return;
-    await supabase.storage.from("mediaa").remove([path]);
+    await fetch("/api/media", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paths: [path] })
+    });
     await load();
-    await loadUsage();
   }
 
   async function handleReplace(path: string, file: File) {
-    await supabase.storage.from("mediaa").upload(path, file, { upsert: true });
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", path.split("/").slice(0, -1).join("/"));
+    await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
     await load();
   }
 
@@ -219,8 +202,8 @@ export default function MediaLibraryClient() {
       )}
 
       <div className="flex items-center justify-between text-sm text-dark-6">
-        <div>{loading ? "Loading..." : `${items.length} items${search ? " (filtered)" : ""}`}</div>
-        <div>{usageBytes != null ? `Approx. usage: ${(usageBytes / (1024 * 1024)).toFixed(1)} MB` : ""}</div>
+        <div>{loading ? "Loading..." : `${items.length} items on page`}</div>
+        <div>Total: {total} files</div>
       </div>
 
       {view === "grid" ? (
@@ -240,10 +223,10 @@ export default function MediaLibraryClient() {
                 {(f.size ? `${(f.size / 1024).toFixed(0)} KB` : "")}{f.updated_at ? ` · ${new Date(f.updated_at).toLocaleDateString()}` : ""}
               </div>
               <div className="mt-2 grid min-h-[36px] grid-cols-3 gap-2">
-                <button title="Copy URL" className={cn(buttonVariants({ variant: "ghost", shape: "rounded", size: "tiny" }), "whitespace-nowrap") } onClick={() => copySingle(f.path, f.url)}>
+                <button title="Copy URL" className={cn(buttonVariants({ variant: "ghost", shape: "rounded", size: "tiny" }), "whitespace-nowrap")} onClick={() => copySingle(f.path, f.url)}>
                   {copiedId === f.path ? "Copied" : "Copy"}
                 </button>
-                <label className={cn(buttonVariants({ variant: "outlinePrimary", shape: "rounded", size: "tiny" }), "text-center whitespace-nowrap") }>
+                <label className={cn(buttonVariants({ variant: "outlinePrimary", shape: "rounded", size: "tiny" }), "text-center whitespace-nowrap cursor-pointer")}>
                   Replace
                   <input type="file" className="hidden" onChange={(e) => e.target.files && handleReplace(f.path, e.target.files[0])} accept="image/*" />
                 </label>
@@ -285,7 +268,7 @@ export default function MediaLibraryClient() {
                       <button title="Copy URL" className={cn(buttonVariants({ variant: "ghost", shape: "rounded", size: "tiny" }), "whitespace-nowrap")} onClick={() => copySingle(f.path, f.url)}>
                         {copiedId === f.path ? "Copied" : "Copy"}
                       </button>
-                      <label className={cn(buttonVariants({ variant: "outlinePrimary", shape: "rounded", size: "tiny" }), "whitespace-nowrap")}>
+                      <label className={cn(buttonVariants({ variant: "outlinePrimary", shape: "rounded", size: "tiny" }), "whitespace-nowrap cursor-pointer")}>
                         Replace
                         <input type="file" className="hidden" onChange={(e) => e.target.files && handleReplace(f.path, e.target.files[0])} accept="image/*" />
                       </label>
@@ -325,4 +308,4 @@ export default function MediaLibraryClient() {
       )}
     </div>
   );
-} 
+}

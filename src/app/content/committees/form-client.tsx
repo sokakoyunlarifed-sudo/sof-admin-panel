@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -15,7 +14,6 @@ export type CommitteeDraft = {
 
 export default function CommitteeFormClient({ initial, mode, id }: { initial?: Partial<CommitteeDraft>; mode: "new" | "edit"; id?: string }) {
   const router = useRouter();
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,14 +27,21 @@ export default function CommitteeFormClient({ initial, mode, id }: { initial?: P
     setSaving(true);
     setError(null);
     try {
-      if (mode === "new") {
-        const { error: e } = await supabase.from("committees").insert({ name: draft.name, role: draft.role, image: draft.image });
-        if (e) throw e;
-      } else if (mode === "edit" && id) {
-        const { error: e } = await supabase.from("committees").update({ name: draft.name, role: draft.role, image: draft.image }).eq("id", id);
-        if (e) throw e;
+      const url = mode === "new" ? "/api/committees" : `/api/committees/${id}`;
+      const method = mode === "new" ? "POST" : "PUT";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draft)
+      });
+
+      if (!res.ok) {
+        throw new Error("Kaydetme başarısız");
       }
+
       router.replace("/content/committees");
+      router.refresh();
     } catch (err: any) {
       setError(err?.message || "Kaydetme başarısız");
     } finally {
@@ -49,8 +54,10 @@ export default function CommitteeFormClient({ initial, mode, id }: { initial?: P
     if (!confirm("Bu kurulu silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setSaving(true);
     try {
-      await supabase.from("committees").delete().eq("id", id);
+      const res = await fetch(`/api/committees/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Silme başarısız");
       router.replace("/content/committees");
+      router.refresh();
     } finally {
       setSaving(false);
     }

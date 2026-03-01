@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useState } from "react";
 import { ImageUploader } from "@/components/media/ImageUploader";
+import { MultiImageUploader } from "@/components/media/MultiImageUploader";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,8 @@ export type NewsDraft = {
   short_text: string | null;
   full_text: string | null;
   image: string | null;
+  video_url: string | null;
+  images: string[];
 };
 
 function toLocalDateValue(d?: string | null) {
@@ -26,7 +28,6 @@ function toLocalDateValue(d?: string | null) {
 
 export default function NewsFormClient({ initial, mode, id }: { initial?: Partial<NewsDraft> & { created_at?: string | null }; mode: "new" | "edit"; id?: string }) {
   const router = useRouter();
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,35 +38,30 @@ export default function NewsFormClient({ initial, mode, id }: { initial?: Partia
     short_text: initial?.short_text || null,
     full_text: initial?.full_text || null,
     image: initial?.image || null,
+    video_url: initial?.video_url || null,
+    images: initial?.images || [],
   });
 
   async function handleSave() {
     setSaving(true);
     setError(null);
     try {
-      if (mode === "new") {
-        const { error: e } = await supabase.from("news").insert({
-          title: draft.title,
-          date: draft.date,
-          short_text: draft.short_text,
-          full_text: draft.full_text,
-          image: draft.image,
-        });
-        if (e) throw e;
-      } else if (mode === "edit" && id) {
-        const { error: e } = await supabase
-          .from("news")
-          .update({
-            title: draft.title,
-            date: draft.date,
-            short_text: draft.short_text,
-            full_text: draft.full_text,
-            image: draft.image,
-          })
-          .eq("id", id);
-        if (e) throw e;
+      const url = mode === "new" ? "/api/news" : `/api/news/${id}`;
+      const method = mode === "new" ? "POST" : "PUT";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draft)
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Kaydetme başarısız");
       }
+
       router.replace("/content/news");
+      router.refresh(); // force refresh lists
     } catch (err: any) {
       setError(err?.message || "Kaydetme başarısız");
     } finally {
@@ -78,8 +74,12 @@ export default function NewsFormClient({ initial, mode, id }: { initial?: Partia
     if (!confirm("Bu haberi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setSaving(true);
     try {
-      await supabase.from("news").delete().eq("id", id);
+      const res = await fetch(`/api/news/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Silme başarısız");
       router.replace("/content/news");
+      router.refresh();
+    } catch (err: any) {
+      setError(err?.message || "Silme başarısız");
     } finally {
       setSaving(false);
     }
@@ -117,6 +117,14 @@ export default function NewsFormClient({ initial, mode, id }: { initial?: Partia
               onChange={(e) => setDraft({ ...draft, date: e.target.value || null })}
             />
 
+            <label className="block text-sm">YouTube Video URL (Opsiyonel)</label>
+            <input
+              className="w-full rounded border p-2"
+              placeholder="Örn: https://www.youtube.com/watch?v=..."
+              value={draft.video_url || ""}
+              onChange={(e) => setDraft({ ...draft, video_url: e.target.value || null })}
+            />
+
             <label className="block text-sm">Kısa Metin</label>
             <textarea className="w-full rounded border p-2" value={draft.short_text || ""} onChange={(e) => setDraft({ ...draft, short_text: e.target.value || null })} />
 
@@ -134,8 +142,17 @@ export default function NewsFormClient({ initial, mode, id }: { initial?: Partia
               onUploaded={(url) => setDraft({ ...draft, image: url })}
             />
           </div>
+
+          <div className="rounded border p-4 dark:border-dark-3">
+            <h2 className="mb-2 font-medium">Diğer Görseller (Çoklu Yükleme)</h2>
+            <MultiImageUploader
+              folder="news"
+              initialUrls={draft.images}
+              onChange={(urls: string[]) => setDraft({ ...draft, images: urls })}
+            />
+          </div>
         </div>
       </div>
     </div>
   );
-} 
+}

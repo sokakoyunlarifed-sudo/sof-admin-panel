@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useState } from "react";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -17,7 +16,6 @@ export type AnnouncementDraft = {
 
 export default function AnnouncementFormClient({ initial, mode, id }: { initial?: Partial<AnnouncementDraft>; mode: "new" | "edit"; id?: string }) {
   const router = useRouter();
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,29 +31,22 @@ export default function AnnouncementFormClient({ initial, mode, id }: { initial?
     setSaving(true);
     setError(null);
     try {
-      if (mode === "new") {
-        const { error: e } = await supabase.from("announcements").insert({
-          title: draft.title,
-          date: draft.date,
-          location: draft.location,
-          description: draft.description,
-          image: draft.image,
-        });
-        if (e) throw e;
-      } else if (mode === "edit" && id) {
-        const { error: e } = await supabase
-          .from("announcements")
-          .update({
-            title: draft.title,
-            date: draft.date,
-            location: draft.location,
-            description: draft.description,
-            image: draft.image,
-          })
-          .eq("id", id);
-        if (e) throw e;
+      const url = mode === "new" ? "/api/announcements" : `/api/announcements/${id}`;
+      const method = mode === "new" ? "POST" : "PUT";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draft)
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Kaydetme başarısız");
       }
+
       router.replace("/content/announcements");
+      router.refresh();
     } catch (err: any) {
       setError(err?.message || "Kaydetme başarısız");
     } finally {
@@ -68,8 +59,10 @@ export default function AnnouncementFormClient({ initial, mode, id }: { initial?
     if (!confirm("Bu öğeyi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setSaving(true);
     try {
-      await supabase.from("announcements").delete().eq("id", id);
+      const res = await fetch(`/api/announcements/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Silme başarısız");
       router.replace("/content/announcements");
+      router.refresh();
     } finally {
       setSaving(false);
     }
@@ -100,7 +93,7 @@ export default function AnnouncementFormClient({ initial, mode, id }: { initial?
             <input className="w-full rounded border p-2" value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} />
 
             <label className="block text-sm">Tarih</label>
-            <input type="date" className="w-full rounded border p-2" value={draft.date || ""} onChange={(e) => setDraft({ ...draft, date: e.target.value || null })} />
+            <input type="date" className="w-full rounded border p-2" value={draft.date ? new Date(draft.date).toISOString().split("T")[0] : ""} onChange={(e) => setDraft({ ...draft, date: e.target.value || null })} />
 
             <label className="block text-sm">Yer</label>
             <input className="w-full rounded border p-2" value={draft.location || ""} onChange={(e) => setDraft({ ...draft, location: e.target.value || null })} />
@@ -119,4 +112,4 @@ export default function AnnouncementFormClient({ initial, mode, id }: { initial?
       </div>
     </div>
   );
-} 
+}

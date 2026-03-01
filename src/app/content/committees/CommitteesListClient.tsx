@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -21,15 +20,15 @@ export default function CommitteesListClient({ initial, role }: { initial: Commi
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
-
   async function load() {
     setLoading(true);
     try {
-      let query = supabase.from("committees").select("id,name,role,created_at,image").order("created_at", { ascending: false });
-      if (search) query = query.ilike("name", `%${search}%`);
-      const { data } = await query;
-      setRows((data || []) as any);
+      const res = await fetch("/api/committees");
+      let data = await res.json();
+      if (search) {
+        data = data.filter((n: any) => n.name.toLowerCase().includes(search.toLowerCase()));
+      }
+      setRows(data);
     } finally {
       setLoading(false);
     }
@@ -44,8 +43,8 @@ export default function CommitteesListClient({ initial, role }: { initial: Commi
     if (!confirm("Bu kurulu silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setLoading(true);
     try {
-      const { error } = await supabase.from("committees").delete().eq("id", id);
-      if (!error) setRows((r) => r.filter((x) => x.id !== id));
+      const res = await fetch(`/api/committees/${id}`, { method: "DELETE" });
+      if (res.ok) setRows((r) => r.filter((x) => x.id !== id));
     } finally {
       setLoading(false);
     }

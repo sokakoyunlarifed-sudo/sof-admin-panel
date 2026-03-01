@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { ImageUploader } from "@/components/media/ImageUploader";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
@@ -38,8 +37,7 @@ export default function EventFormClient({
   id?: string;
 }) {
   const router = useRouter();
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
-
+  
   const [activeTab, setActiveTab] = useState<"en" | "az">("en");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,42 +67,6 @@ export default function EventFormClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [en.event_date]);
 
-  async function upsertAz(userId: string | null, published_at: string | null, created_at_iso: string, event_date_iso: string | null) {
-    const exists = await supabase
-      .from("events_az")
-      .select("id")
-      .eq("title", az.title || en.title)
-      .eq("event_date", event_date_iso)
-      .maybeSingle();
-    if (exists.data?.id) {
-      return supabase
-        .from("events_az")
-        .update({
-          title: az.title || en.title,
-          description: az.description || null,
-          location: az.location || en.location || null,
-          event_date: event_date_iso,
-          image_url: az.image_url || en.image_url,
-          published_at,
-          created_at: created_at_iso,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", exists.data.id);
-    } else {
-      return supabase.from("events_az").insert({
-        title: az.title || en.title,
-        description: az.description || null,
-        location: az.location || en.location || null,
-        event_date: event_date_iso,
-        image_url: az.image_url || en.image_url,
-        published_at,
-        created_by: userId,
-        created_at: created_at_iso,
-        updated_at: new Date().toISOString(),
-      });
-    }
-  }
-
   async function audit(action: string, extra?: Record<string, any>) {
     try {
       await fetch("/api/audit", {
@@ -130,52 +92,26 @@ export default function EventFormClient({
     setSaving(true);
     setError(null);
     try {
-      const { data: u } = await supabase.auth.getUser();
-      const userId = u.user?.id ?? null;
       const published_at = publish ? new Date().toISOString() : null;
       const created_at_iso = createdAt ? new Date(createdAt).toISOString() : new Date().toISOString();
-      const event_date_iso = eventDate ? new Date(eventDate).toISOString() : null;
+      
+      const payload = {
+        en, az, published_at, created_at_iso
+      };
 
-      if (mode === "new") {
-        const { error: e1 } = await supabase.from("events").insert({
-          title: en.title,
-          description: en.description || null,
-          location: en.location || null,
-          event_date: event_date_iso,
-          image_url: en.image_url,
-          published_at,
-          created_by: userId,
-          created_at: created_at_iso,
-          updated_at: new Date().toISOString(),
-        });
-        if (e1) throw e1;
-        const { error: e2 } = await upsertAz(userId, published_at, created_at_iso, event_date_iso);
-        if (e2) throw e2;
-        await audit(publish ? "event_created_published" : "event_created_draft", { published: !!published_at });
-      } else if (mode === "edit" && id) {
-        const wasPublished = !!initialEn?.published_at;
-        const willBePublished = !!published_at;
-        const { error: e1 } = await supabase
-          .from("events")
-          .update({
-            title: en.title,
-            description: en.description || null,
-            location: en.location || null,
-            event_date: event_date_iso,
-            image_url: en.image_url,
-            published_at,
-            created_at: created_at_iso,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", id);
-        if (e1) throw e1;
-        const { error: e2 } = await upsertAz(userId, published_at, created_at_iso, event_date_iso);
-        if (e2) throw e2;
-        if (!wasPublished && willBePublished) await audit("event_published", { published: true });
-        else if (wasPublished && !willBePublished) await audit("event_unpublished", { published: false });
-        else await audit("event_updated", { published: willBePublished });
-      }
+      const url = mode === "new" ? "/api/events" : `/api/events/${id}`;
+      const method = mode === "new" ? "POST" : "PUT";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Kaydetme başarısız");
+
+      await audit(publish ? "events_published" : "events_draft", { published: !!published_at });
       router.replace("/content/events");
+      router.refresh();
     } catch (err: any) {
       setError(err?.message || "Kaydetme başarısız");
     } finally {
@@ -185,14 +121,15 @@ export default function EventFormClient({
 
   async function handleDelete() {
     if (!id) return;
-    if (!confirm("Bu etkinliği silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
+    if (!confirm("Bu öğeyi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setSaving(true);
     try {
-      await supabase.from("events").delete().eq("id", id);
-      // try delete az by matching title and date
-      if (en.title && eventDate) await supabase.from("events_az").delete().eq("title", en.title).eq("event_date", new Date(eventDate).toISOString());
-      await audit("event_deleted", { title: en.title || null });
-      router.replace("/content/events");
+      const res = await fetch(`/api/events/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        await audit("events_deleted", {});
+        router.replace("/content/events");
+        router.refresh();
+      }
     } finally {
       setSaving(false);
     }

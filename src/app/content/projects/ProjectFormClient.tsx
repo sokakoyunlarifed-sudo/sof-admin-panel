@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { ImageUploader } from "@/components/media/ImageUploader";
 import { buttonVariants } from "@/components/ui-elements/button";
 import { cn } from "@/lib/utils";
@@ -46,8 +45,7 @@ export default function ProjectFormClient({
   id?: string;
 }) {
   const router = useRouter();
-  const supabase = useMemo(() => getSupabaseBrowserClient(), []);
-
+  
   const [activeTab, setActiveTab] = useState<"en" | "az">("en");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,41 +74,6 @@ export default function ProjectFormClient({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function upsertAzWithSlug(userId: string | null, published_at: string | null, created_at_iso: string) {
-    const exists = await supabase
-      .from("projects_az")
-      .select("id")
-      .eq("slug", az.slug || en.slug)
-      .maybeSingle();
-    if (exists.data?.id) {
-      return supabase
-        .from("projects_az")
-        .update({
-          title: az.title || en.title,
-          summary: az.summary || null,
-          content: az.content || null,
-          slug: az.slug || en.slug || null,
-          image_url: az.image_url || en.image_url,
-          published_at,
-          created_at: created_at_iso,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", exists.data.id);
-    } else {
-      return supabase.from("projects_az").insert({
-        title: az.title || en.title,
-        summary: az.summary || null,
-        content: az.content || null,
-        slug: az.slug || en.slug || null,
-        image_url: az.image_url || en.image_url,
-        published_at,
-        created_by: userId,
-        created_at: created_at_iso,
-        updated_at: new Date().toISOString(),
-      });
-    }
-  }
-
   async function audit(action: string, extra?: Record<string, any>) {
     try {
       await fetch("/api/audit", {
@@ -136,51 +99,26 @@ export default function ProjectFormClient({
     setSaving(true);
     setError(null);
     try {
-      const { data: u } = await supabase.auth.getUser();
-      const userId = u.user?.id ?? null;
       const published_at = publish ? new Date().toISOString() : null;
       const created_at_iso = createdAt ? new Date(createdAt).toISOString() : new Date().toISOString();
+      
+      const payload = {
+        en, az, published_at, created_at_iso
+      };
 
-      if (mode === "new") {
-        const { error: e1 } = await supabase.from("projects").insert({
-          title: en.title,
-          summary: en.summary || null,
-          content: en.content || null,
-          slug: en.slug || null,
-          image_url: en.image_url,
-          published_at,
-          created_by: userId,
-          created_at: created_at_iso,
-          updated_at: new Date().toISOString(),
-        });
-        if (e1) throw e1;
-        const { error: e2 } = await upsertAzWithSlug(userId, published_at, created_at_iso);
-        if (e2) throw e2;
-        await audit(publish ? "project_created_published" : "project_created_draft", { published: !!published_at });
-      } else if (mode === "edit" && id) {
-        const wasPublished = !!initialEn?.published_at;
-        const willBePublished = !!published_at;
-        const { error: e1 } = await supabase
-          .from("projects")
-          .update({
-            title: en.title,
-            summary: en.summary || null,
-            content: en.content || null,
-            slug: en.slug || null,
-            image_url: en.image_url,
-            published_at,
-            created_at: created_at_iso,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", id);
-        if (e1) throw e1;
-        const { error: e2 } = await upsertAzWithSlug(userId, published_at, created_at_iso);
-        if (e2) throw e2;
-        if (!wasPublished && willBePublished) await audit("project_published", { published: true });
-        else if (wasPublished && !willBePublished) await audit("project_unpublished", { published: false });
-        else await audit("project_updated", { published: willBePublished });
-      }
+      const url = mode === "new" ? "/api/projects" : `/api/projects/${id}`;
+      const method = mode === "new" ? "POST" : "PUT";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Kaydetme başarısız");
+
+      await audit(publish ? "projects_published" : "projects_draft", { published: !!published_at });
       router.replace("/content/projects");
+      router.refresh();
     } catch (err: any) {
       setError(err?.message || "Kaydetme başarısız");
     } finally {
@@ -190,13 +128,15 @@ export default function ProjectFormClient({
 
   async function handleDelete() {
     if (!id) return;
-    if (!confirm("Bu projeyi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
+    if (!confirm("Bu öğeyi silmek istiyor musunuz? Bu işlem geri alınamaz.")) return;
     setSaving(true);
     try {
-      await supabase.from("projects").delete().eq("id", id);
-      if (en.slug) await supabase.from("projects_az").delete().eq("slug", en.slug);
-      await audit("project_deleted", { slug: en.slug || null });
-      router.replace("/content/projects");
+      const res = await fetch(`/api/projects/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        await audit("projects_deleted", {});
+        router.replace("/content/projects");
+        router.refresh();
+      }
     } finally {
       setSaving(false);
     }

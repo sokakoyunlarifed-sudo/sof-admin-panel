@@ -2,8 +2,6 @@
 
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-
 export function ImageUploader({
   onUploaded,
   folder,
@@ -20,18 +18,18 @@ export function ImageUploader({
     if (!file) return;
     setUploading(true);
     try {
-      const supabase = getSupabaseBrowserClient();
-      const ext = file.name.split(".").pop() || "png";
-      const random = Math.random().toString(36).slice(2, 8);
-      const timestamp = Date.now();
-      const path = `${folder}/${timestamp}-${random}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("mediaa")
-        .upload(path, file, { cacheControl: "3600", upsert: false });
-      if (uploadError) throw uploadError;
-      const { data } = supabase.storage.from("mediaa").getPublicUrl(path);
-      setUrl(data.publicUrl);
-      onUploaded(data.publicUrl, path);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", folder);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Yükleme başarısız");
+      const data = await res.json();
+      setUrl(data.url);
+      onUploaded(data.url, data.url);
     } catch (e) {
       console.error(e);
       alert("Yükleme başarısız");
