@@ -39,8 +39,7 @@ export default function SigninWithPassword() {
       if (!res.ok) {
         setError(result.error || "Giriş başarısız oldu");
       } else {
-        router.replace("/");
-        router.refresh();
+        window.location.href = "/";
       }
     } catch (err: any) {
       setError(err?.message || "Beklenmeyen bir hata oluştu");

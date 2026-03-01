@@ -5,8 +5,8 @@ export async function POST(req: NextRequest) {
         const { email, password } = await req.json();
 
         // Since there's only one admin gmail as requested
-        const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_DEMO_USER_MAIL || "admin@soffed.com";
-        const adminPassword = process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_DEMO_USER_PASS || "admin123";
+        const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_DEMO_USER_MAIL || "admin@sof.web.tr";
+        const adminPassword = process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_DEMO_USER_PASS || "@L1y3V$8mQ!zR";
 
         if (email === adminEmail && password === adminPassword) {
             const token = process.env.ADMIN_SESSION_SECRET || "fallback_secret_token_123!";
