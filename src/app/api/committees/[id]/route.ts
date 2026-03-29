@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { triggerSync } from '@/lib/utils/deploy';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -33,6 +34,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
             .single();
 
         if (error) throw error;
+        
+        await triggerSync();
+        
         return NextResponse.json(data);
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
@@ -49,6 +53,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
             .eq('id', id);
 
         if (error) throw error;
+        
+        await triggerSync();
+        
         return NextResponse.json({ success: true });
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });

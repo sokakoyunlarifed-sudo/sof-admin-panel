@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { triggerSync } from '@/lib/utils/deploy';
 
 export async function GET(req: NextRequest) {
     try {
@@ -29,6 +30,9 @@ export async function POST(req: NextRequest) {
             .single();
 
         if (error) throw error;
+        
+        await triggerSync();
+        
         return NextResponse.json(data);
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
